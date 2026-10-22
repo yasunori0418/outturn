@@ -120,10 +120,10 @@ type Envelope[TItem, TChange, TInfo, TEnvInfo any] struct {
 // producer が nil slice のまま marshal すると null が出力され schema violation になる。
 // この footgun を型レベルで塞ぐため、両型に MarshalJSON を実装して nil を空配列へ正規化する。
 //
-// generic type alias(type A[T] = B[T])は Go 1.24 要求のため使わず、method を持たない
-// 別名の generic 定義型(シャドー)へ変換してから既定のフィールド直列化に委ねる shadow struct
-// 方式で go 1.22 のまま実装する。シャドー型は Envelope / Result の method を継承しないため
-// json.Marshal がそこで無限再帰しない。
+// method を持たない別名の generic 定義型(シャドー)へ変換してから既定のフィールド直列化に
+// 委ねる shadow struct 方式で実装する。シャドー型は Envelope / Result の method を継承しないため
+// json.Marshal がそこで無限再帰しない。generic type alias(type A[T] = B[T])は元の型と
+// 同一の型で MarshalJSON も引き継ぐため、この用途には使えない。
 
 // envelopeShadow は Envelope と同一フィールドだが MarshalJSON を持たないシャドー型。
 type envelopeShadow[TItem, TChange, TInfo, TEnvInfo any] Envelope[TItem, TChange, TInfo, TEnvInfo]
