@@ -14,7 +14,7 @@ pkgs.buildGoModule {
   version = "0.1.0";
   src = ../..;
   modRoot = "go";
-  vendorHash = "sha256-MRcG+GJbmYtFjAed08elVK+ORUWOXed05mUoPH1Llr8=";
+  vendorHash = "sha256-zNR5lwy3G+MJEOyU9OP/KYFDWid1hzPOo8GtExfaKW0=";
   subPackages = [ "cmd/validate" ];
   doCheck = true;
   checkPhase = ''
