@@ -16,6 +16,8 @@ import (
 	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/yasunori0418/outturn/go/internal/spec"
 )
 
 // testdata に現れる item id(sha256(JCS(identity)) の 64 文字 hex)。
@@ -523,6 +525,36 @@ func TestMarshalNormalizesNilArrays(t *testing.T) {
 	}
 	if rdec.Items == nil || string(*rdec.Items) != "[]" {
 		t.Errorf("nil Items が [] に正規化されていない: got %s", rgot)
+	}
+}
+
+// TestMarshalEmitsRequiredKeys はエンベロープ直下の必須フィールドが、ゼロ値でも
+// 出力から消えないこと(JSON タグに omitempty / omitzero が付いていないこと)を固定する。
+// 必須キーは embed 済み schema の直下 required から読み、テストに直書きしない。
+// 値は検査しない(ゼロ値の適合性は問わず、キーの存在だけを見る)。
+func TestMarshalEmitsRequiredKeys(t *testing.T) {
+	var schema struct {
+		Required []string `json:"required"`
+	}
+	if err := json.Unmarshal([]byte(spec.SchemaV1JSON), &schema); err != nil {
+		t.Fatalf("unmarshal schema: %v", err)
+	}
+	if len(schema.Required) == 0 {
+		t.Fatal("schema の直下 required が空。schema の読み違いで検査が素通りしている")
+	}
+
+	got, err := json.Marshal(rawEnvelope{})
+	if err != nil {
+		t.Fatalf("marshal envelope: %v", err)
+	}
+	var decoded map[string]json.RawMessage
+	if err := json.Unmarshal(got, &decoded); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	for _, key := range schema.Required {
+		if _, ok := decoded[key]; !ok {
+			t.Errorf("必須キー %q がゼロ値の出力から消えている(omitempty / omitzero が付いていないか): %s", key, got)
+		}
 	}
 }
 
