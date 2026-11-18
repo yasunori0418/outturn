@@ -18,7 +18,7 @@
 
 - 実行結果と差分は別概念であり、混ぜると型と意味の両方が曖昧になる。
 - dry-run スキーマ同一原則（→ ADR-0009）により plan / apply の両方が changes を出力する。plan では「実行したら生じる差分」、apply では「実際に生じた差分」。
-- 可逆性（`reversible`）は**行為の属性**なので changes 要素に置く。item は結果の記録であり可逆性を持たない。ncompose の rollback 指揮は changes の走査で完結する。
+- 可逆性（`reversible`）は**行為の属性**なので changes 要素に置く。item は結果の記録であり可逆性を持たない。オーケストレータの rollback 指揮は changes の走査で完結する。
 - check を items で表現すれば、サブコマンドごとに result 型を増やさずに済む。
 
 ## 影響

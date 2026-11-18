@@ -123,4 +123,4 @@ cp example.envrc .envrc && direnv allow    # または: nix develop ./dev
 ## 関連
 
 - [layat](https://github.com/yasunori0418/layat) — 配置プリミティブ（エコシステムの起点・active）
-- 他ツール（nboot / nwrap / nherd / nshadow / ncompose）は planned。[docs/ecosystem/overview.md](docs/ecosystem/overview.md) を参照
+- 他ツールは planned。[docs/ecosystem/overview.md](docs/ecosystem/overview.md) を参照

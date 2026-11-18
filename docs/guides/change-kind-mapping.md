@@ -1,6 +1,6 @@
 # 動作系ツールの change.kind マッピング指針
 
-nherd のようにサービス・プロセスの動作（start / stop / restart / reload）を扱う「動作系」ツールが、動作を `change.kind`（`add` / `remove` / `modify`）へどうマップするかの指針。本書は規範ではなく指針であり、規範は `spec/v1/spec.md`（§3, §4）にある。
+サービス差分適用ツールのようにサービス・プロセスの動作（start / stop / restart / reload）を扱う「動作系」ツールが、動作を `change.kind`（`add` / `remove` / `modify`）へどうマップするかの指針。本書は規範ではなく指針であり、規範は `spec/v1/spec.md`（§3, §4）にある。
 
 ## 前提
 

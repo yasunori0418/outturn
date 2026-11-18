@@ -6,7 +6,7 @@
 
 ## 背景
 
-ADR-0014 は rollback の呼び出し規約を ncompose の領分とし、outturn は判断材料（`changes` / `reversible` / 適用済み差分）の完全性のみを担うと決めた。しかし spec §4 は「差分のある項目のみを列挙する」としか規定しておらず、apply が途中で失敗したとき `changes[]` がどこまで完全であるべきかは未規定だった。特に item が `failed` のとき change を出すべきかは曖昧で、「途中まで適用されて失敗した」（例: 旧 symlink を除去した後、新 symlink の作成に失敗した）場合に現実の変化が changes から欠落しうる。ncompose の rollback 指揮は changes の走査で完結する設計（→ ADR-0003）のため、失敗した実行でこそ changes の完全性が要る。（tracking #8 / #11）
+ADR-0014 は rollback の呼び出し規約をオーケストレータの領分とし、outturn は判断材料（`changes` / `reversible` / 適用済み差分）の完全性のみを担うと決めた。しかし spec §4 は「差分のある項目のみを列挙する」としか規定しておらず、apply が途中で失敗したとき `changes[]` がどこまで完全であるべきかは未規定だった。特に item が `failed` のとき change を出すべきかは曖昧で、「途中まで適用されて失敗した」（例: 旧 symlink を除去した後、新 symlink の作成に失敗した）場合に現実の変化が changes から欠落しうる。オーケストレータの rollback 指揮は changes の走査で完結する設計（→ ADR-0003）のため、失敗した実行でこそ changes の完全性が要る。（tracking #8 / #11）
 
 ## 決定
 

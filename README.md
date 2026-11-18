@@ -125,4 +125,4 @@ cp example.envrc .envrc && direnv allow    # or: nix develop ./dev
 ## Related
 
 - [layat](https://github.com/yasunori0418/layat) — the placement primitive (the ecosystem's origin; active).
-- The other tools (nboot / nwrap / nherd / nshadow / ncompose) are planned. See [docs/ecosystem/overview.md](docs/ecosystem/overview.md).
+- The other tools are planned. See [docs/ecosystem/overview.md](docs/ecosystem/overview.md).

@@ -9,7 +9,7 @@
 
 ## 背景
 
-現行エンベロープは「1 実行 = 1 論理操作 = 1 result」を暗黙前提とし、単一主体しか表せない。layat `apply --all`（1 実行 = N 個の独立 config への配置）や、複数対象を束ねる将来ツール（nherd 等）はこれを表現できない。stdout の単一文書規律（§1・NDJSON 禁止）を保ったまま、複数主体の結果を 1 文書に並べる手段が要る。
+現行エンベロープは「1 実行 = 1 論理操作 = 1 result」を暗黙前提とし、単一主体しか表せない。layat `apply --all`（1 実行 = N 個の独立 config への配置）や、複数対象を束ねる将来ツール（サービス差分適用ツール等）はこれを表現できない。stdout の単一文書規律（§1・NDJSON 禁止）を保ったまま、複数主体の結果を 1 文書に並べる手段が要る。
 
 ## 決定
 
@@ -26,7 +26,7 @@
 - 容器を `results[]` の 1 つに統一することで、schema と消費側の分岐を単一化し、single / batch で 2 種類の容器を二重管理することを避ける。
 - `mode` を唯一の判別子にし、`result` / `results` の有無のような second discriminator を持たない。判別子は 1 つに閉じる。
 - `mode` を起動の性質で決めることで、消費側はコマンド形式から結果の形を予測でき、同じ起動が常に同型になる。
-- `tool` / `command` をトップレベルのみに置くことで、batch が単一ツール・単一コマンドであることが構造で担保され、複数ツールの束ね（ncompose の領分）と混ざらない。
+- `tool` / `command` をトップレベルのみに置くことで、batch が単一ツール・単一コマンドであることが構造で担保され、複数ツールの束ね（オーケストレータの領分）と混ざらない。
 
 ## 影響
 
@@ -39,5 +39,5 @@
 
 - **single は `result` 単数・batch は `results[]` の 2 容器（mode で result XOR results）**: 多数派の single が今の `.result` 形のまま簡潔になる利点はあるが、schema が result 枝と results 枝の 2 分岐を抱え容器の二重管理を招く。一様性と単一 schema を優先して棄却。
 - **`result` / `results` の有無を判別子にする（`mode` を持たない）**: 判別子が暗黙になる。`mode` という明示子の方が起動の性質との対応が明快で、consumer の分岐も安定する。
-- **per-subject 要素を完全な sub-envelope にする（specVersion / tool / command / mode を各要素に持たせ単独再流通可能に）**: single が要素にエンベロープ全体を二重化して冗長。単独再流通（ncompose の切り出し）は現時点で投機的価値であり、軽量な SubjectResult を優先して棄却。
+- **per-subject 要素を完全な sub-envelope にする（specVersion / tool / command / mode を各要素に持たせ単独再流通可能に）**: single が要素にエンベロープ全体を二重化して冗長。単独再流通（オーケストレータによる切り出し）は現時点で投機的価値であり、軽量な SubjectResult を優先して棄却。
 - **read-only 列挙（list-generations の世代行・gitignore の行）を item に拡張する**: 世代・列挙は read-only で副作用がなく `changes` も cross-run 照合も持たないため、id 導出（§5）の機構が無用になる。列挙はツール固有インベントリとして `result.info` に置けば足りる（→ ADR-0007）。item は「処理単位の実行結果の記録」の定義を保つ。これに伴い §5 の「key に世代番号を含めてはならない」は書き換え不要となる（世代番号がどの key にも入らないため衝突しない）。

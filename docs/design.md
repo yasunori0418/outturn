@@ -80,4 +80,4 @@ outturn/
 
 `flake.nix` の `packages.validate` の `version = "0.1.0"` は Go 参照実装の実装バージョンであり、規格タグ `v1.N.P` とは独立して増減する。
 
-**v1 stable 宣言**: 2 ツール適合（layat + 次ツール、M2 の nboot 想定）を基準とする。宣言時に README / overview の draft 表記を落とし、spec 英語版の要否を再検討する（→ ADR-0026）。
+**v1 stable 宣言**: 2 ツール適合（layat + 次ツール、M2 のブート世代マネージャを想定）を基準とする。宣言時に README / overview の draft 表記を落とし、spec 英語版の要否を再検討する（→ ADR-0026）。
