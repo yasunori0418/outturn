@@ -28,7 +28,7 @@ ADR-0021 で適合検査は「schema 検証 + validate.py リント + id-vectors
 
 ## 根拠
 
-- 求めていた「型情報もデータもスキーマから(gRPC 的)」は **CUE では綺麗に実現しない**。gengotypes は if/then で退行し(b)、公開契約は JSON Schema 維持が要る(a の膨張・誤変換)。CUE の唯一の実質的勝ちは「検証の単一ソース化」(d)だが、**outturn は nput/nboot 等が消費する共有スペック**で、検証成果物の lingua franca は JSON Schema。CUE は niche で、内部ソースにしても公開 JSON Schema は lint MUST を運べず下流に部分検証が残る。新言語導入の対価に見合わない。
+- 求めていた「型情報もデータもスキーマから(gRPC 的)」は **CUE では綺麗に実現しない**。gengotypes は if/then で退行し(b)、公開契約は JSON Schema 維持が要る(a の膨張・誤変換)。CUE の唯一の実質的勝ちは「検証の単一ソース化」(d)だが、**outturn は layat/nboot 等が消費する共有スペック**で、検証成果物の lingua franca は JSON Schema。CUE は niche で、内部ソースにしても公開 JSON Schema は lint MUST を運べず下流に部分検証が残る。新言語導入の対価に見合わない。
 - Go はこの repo の既存の参照言語(id 導出・testdata decode)。適合検証を Go に寄せると、Python の環境管理問題を「別の env manager(uv)を足す」ではなく「Python を無くす」で根治でき、参照スタックが Go + Nix に一本化される。
 - santhosh-tekuri は本物の Draft 2020-12 validator(自作の JSON Schema 再実装ではない)。schema を正として読む点は Python 版と同じで、適合の意味論は変わらない。
 - Go 実装は producer 向け単一文書 CLI を自然に生む(ADR-0021 で保留した単一文書モード)。

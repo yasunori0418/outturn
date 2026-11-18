@@ -9,7 +9,7 @@ In a UNIX-philosophy ecosystem where each tool has a single responsibility and t
 This repository has two roles:
 
 1. **The outturn specification**: the normative spec, JSON Schema, conformance test data, and reference implementations.
-2. **The ecosystem's central documentation**: the overall vision for the n-prefixed tools and the distribution plan ([docs/ecosystem/](docs/ecosystem/)).
+2. **The ecosystem's central documentation**: the overall vision for the ecosystem's tools and the distribution plan ([docs/ecosystem/](docs/ecosystem/)).
 
 > **Status: draft (specVersion 1)** — the initial design questions are settled. We are now in the phase of stacking backward-compatible changes (adding fields) driven by feedback from real tools.
 
@@ -62,7 +62,7 @@ Every tool writes a single JSON document (the envelope) — and nothing else —
 ```jsonc
 {
   "specVersion": 1,
-  "tool": { "name": "nput", "version": "0.9.0" },
+  "tool": { "name": "layat", "version": "0.9.0" },
   "command": "apply",
   "status": "success",            // "success" | "error" (only two values)
   "dryRun": false,                // a plan uses the same schema as apply
@@ -124,5 +124,5 @@ cp example.envrc .envrc && direnv allow    # or: nix develop ./dev
 
 ## Related
 
-- [nput](https://github.com/yasunori0418/nput) — the placement primitive (the ecosystem's origin; active).
+- [layat](https://github.com/yasunori0418/layat) — the placement primitive (the ecosystem's origin; active).
 - The other tools (nboot / nwrap / nherd / nshadow / ncompose) are planned. See [docs/ecosystem/overview.md](docs/ecosystem/overview.md).

@@ -16,7 +16,7 @@
 ```jsonc
 {
   "specVersion": 1,
-  "tool": { "name": "nput", "version": "0.9.0" },
+  "tool": { "name": "layat", "version": "0.9.0" },
   "command": "apply",
   "status": "success",                        // "success" | "error"（集約）
   "dryRun": false,
@@ -98,8 +98,8 @@
 ### Error / Warning
 
 ```jsonc
-{ "code": "E_NPUT_COLLISION",       "message": "...", "detail": { } }
-{ "code": "W_NPUT_FOREIGN_SYMLINK", "message": "...", "detail": { } }
+{ "code": "E_LAYAT_COLLISION",       "message": "...", "detail": { } }
+{ "code": "W_LAYAT_FOREIGN_SYMLINK", "message": "...", "detail": { } }
 ```
 
 - `code` は §6 の命名規則に従う文字列。`detail` は任意のツール固有構造
