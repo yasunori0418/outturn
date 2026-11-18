@@ -74,7 +74,7 @@ go get github.com/yasunori0418/outturn/go@v1.0.0
 
 - `go/example_conformance_test.go` の `ExampleEnvelope`([source](../../go/example_conformance_test.go) / [pkg.go.dev](https://pkg.go.dev/github.com/yasunori0418/outturn/go#example-Envelope))
 
-`Envelope` は 4 つの型引数 `[TItem, TChange, TInfo, TEnvInfo]` を取り、自ツールの info 型でパラメータ化して型付きで組み立てる。`startedAt` / `finishedAt` / `dryRun` は必須(spec §2)で、`startedAt` / `finishedAt` は RFC 3339 形式でないと適合検証で弾かれる。`dryRun` は bool の zero value でも出力に含まれる必要があるため、Go 側で明示せず zero value に頼るなら `omitempty` を付けないこと。item id は identity(`{kind, key}`)から `DeriveID` で機械導出する。値域外(spec §5)は error。
+`Envelope` は 4 つの型引数 `[TItem, TChange, TInfo, TEnvInfo]` を取り、自ツールの info 型でパラメータ化して型付きで組み立てる。`startedAt` / `finishedAt` / `dryRun` / `workingDirectory` は必須(spec §2)で、`startedAt` / `finishedAt` は RFC 3339 形式でないと適合検証で弾かれる。`workingDirectory` には実行時のプロセスの作業ディレクトリの絶対パスを入れる。入力の解決の起点を切り替えるツール(`-C dir` の類)は切り替え後の値を入れる。`dryRun` は bool の zero value でも出力に含まれる必要があるため、Go 側で明示せず zero value に頼るなら `omitempty` を付けないこと。item id は identity(`{kind, key}`)から `DeriveID` で機械導出する。値域外(spec §5)は error。
 
 ツールを知らない消費側は info を `json.RawMessage` でパラメータ化(`outturn.Envelope[json.RawMessage, json.RawMessage, json.RawMessage, json.RawMessage]`)し、規格部分だけを型安全に扱える。
 
@@ -122,6 +122,28 @@ nix run .#validate -- path/to/envelope.json
 ```
 
 正の schema はこの app が store パスから既定注入するため、`-schema` の指定は不要(上書きしたいときのみ Go flag として渡せる)。
+
+## 暗黙の入力の解決結果を info に記録する
+
+作業ディレクトリ・環境変数・既定パスの設定ファイルから入力を解決するツール(暗黙の入力を使うツール)は、次の手順で spec §8 の standalone を満たす。
+
+1. 解決する入力の全てを、stdin の JSON か明示引数でも与えられるようにする。
+2. 与えられなかった入力を自分で解決したら、その解決結果をトップレベル `info` に記録する。ファイルは絶対パス、設定値はその値を記録する。主体ごとに解決結果が違う場合は `result.info` に記録する。
+3. 記録のキーと形は自ツールの info schema で決める(次節)。環境変数の名前は記録しなくてよい。機微な設定値には spec §3 の機微情報の扱いを適用する。
+
+例えば、エントリポイントを作業ディレクトリから探し、環境変数で generator を選ぶツールは次のように記録できる。キー名と値は例で、規格は定めない。
+
+```jsonc
+{
+  "workingDirectory": "/home/alice/dotfiles",
+  "info": {
+    "entrypoint": "/home/alice/dotfiles/entry.nix", // 解決したファイルの絶対パス
+    "generator": "home-manager"                     // 採用した設定値
+  }
+}
+```
+
+この記録義務は適合検証(schema 検証とリント検査)の対象外である(spec §8)。暗黙の入力を使った実行の出力に解決結果が入っていることは、自ツールのテストで確かめる。
 
 ## ツール固有 info schema は各ツールで管理する
 
