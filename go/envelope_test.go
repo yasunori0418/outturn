@@ -67,6 +67,9 @@ func checkEnvelope(t *testing.T, env *rawEnvelope) {
 	if env.FinishedAt == "" {
 		t.Error("finishedAt is empty")
 	}
+	if env.WorkingDirectory == "" {
+		t.Error("workingDirectory is empty")
+	}
 	// results は必須。JSON の [] は非 nil スライスに decode されるので nil は欠落を意味する。
 	if env.Results == nil {
 		t.Error("results is missing")
