@@ -21,6 +21,7 @@ build(Nix eval/build)
 | ツール | 責務 | 状態 | リポジトリ |
 |--------|------|------|-----------|
 | **layat** | store パスの任意パスへの配置（symlink / copy）。世代管理・rollback | **active** | [yasunori0418/layat](https://github.com/yasunori0418/layat) |
+| **世代管理 CLI** | opaque な状態識別子を世代として記録し、一覧・参照・選択・削除を扱う。layat から世代管理を切り離す計画（当初の backend は Nix profile） | planned | [yasunori0418/layat#447](https://github.com/yasunori0418/layat/issues/447) |
 | **ブート世代マネージャ** | kernel / initrd の ESP 配置とブートエントリの世代同期 | planned | — |
 | **setuid ラッパー生成ツール** | setuid / capabilities ラッパーの生成（store の権限モデル上 symlink では原理的に不可能な領分） | planned | — |
 | **サービス差分適用ツール** | サービス差分の restart / reload / skip 適用。init 非依存の責務（初期実装は systemd バックエンド） | planned | — |
