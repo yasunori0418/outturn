@@ -1,0 +1,41 @@
+{
+  "specVersion": 1,
+  "tool": {
+    "name": "layat",
+    "version": "0.1.0"
+  },
+  "command": "apply",
+  "status": "success",
+  "dryRun": false,
+  "startedAt": "2026-07-05T12:34:56+09:00",
+  "finishedAt": "2026-07-05T12:34:58+09:00",
+  "workingDirectory": "/home/alice/dotfiles",
+  "info": {
+    "entrypoint": "/home/alice/dotfiles/entry.nix",
+    "generator": "home-manager"
+  },
+  "results": [
+    {
+      "subject": {
+        "name": "home"
+      },
+      "status": "success",
+      "startedAt": "2026-07-05T12:34:56+09:00",
+      "finishedAt": "2026-07-05T12:34:58+09:00",
+      "result": {
+        "items": [
+          {
+            "id": "2ba0b24fb64819dfe4bab60dd153fe5a636bdd5a7535d32039c1fe24736f97f8",
+            "kind": "entry",
+            "label": ".zshrc",
+            "status": "success",
+            "info": {
+              "target": ".zshrc",
+              "method": "symlink"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

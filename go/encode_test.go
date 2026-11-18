@@ -162,6 +162,30 @@ func goldenEnvelopes() map[string]rawEnvelope {
 			WorkingDirectory: "/home/alice/dotfiles",
 		},
 
+		"implicit-input.json": {
+			SpecVersion:      1,
+			Tool:             Tool{Name: "layat", Version: "0.1.0"},
+			Command:          "apply",
+			Status:           StatusSuccess,
+			StartedAt:        "2026-07-05T12:34:56+09:00",
+			FinishedAt:       "2026-07-05T12:34:58+09:00",
+			WorkingDirectory: "/home/alice/dotfiles",
+			Info:             rawMsg(`{"entrypoint":"/home/alice/dotfiles/entry.nix","generator":"home-manager"}`),
+			Results: []SubjectResult[json.RawMessage, json.RawMessage, json.RawMessage]{
+				{
+					Subject:    Subject{Name: "home"},
+					Status:     StatusSuccess,
+					StartedAt:  "2026-07-05T12:34:56+09:00",
+					FinishedAt: "2026-07-05T12:34:58+09:00",
+					Result: Result[json.RawMessage, json.RawMessage, json.RawMessage]{
+						Items: []Item[json.RawMessage]{
+							{ID: idZshrc, Kind: "entry", Label: ".zshrc", Status: ItemSuccess, Info: rawMsg(infoZshrc)},
+						},
+					},
+				},
+			},
+		},
+
 		"enumeration-error.json": {
 			SpecVersion:      1,
 			Tool:             Tool{Name: "nput", Version: "0.9.0"},
