@@ -55,16 +55,22 @@ func ExampleEnvelope() {
 	const startedAt = "2026-07-22T09:00:00+09:00"
 	const finishedAt = "2026-07-22T09:00:01+09:00"
 
+	// workingDirectory も再現性のため固定値にしている。実装コードでは os.Getwd() で
+	// 実行時のプロセスの作業ディレクトリ(絶対パス)を取得する。入力の解決の起点を
+	// 切り替えるツール(-C dir の類)は切り替え後の値を入れる(spec §2)。
+	const workingDirectory = "/home/alice/dotfiles"
+
 	// Envelope は 4 つの型引数 [TItem, TChange, TInfo, TEnvInfo] を取る。
 	// 自ツールの info 型でパラメータ化して型付きで組み立てる。
 	env := outturn.Envelope[PutInfo, *struct{}, *struct{}, *struct{}]{
-		SpecVersion: 1,
-		Tool:        outturn.Tool{Name: "nput", Version: "0.9.0"},
-		Command:     "apply",
-		Status:      outturn.StatusSuccess,
-		DryRun:      false,
-		StartedAt:   startedAt,
-		FinishedAt:  finishedAt,
+		SpecVersion:      1,
+		Tool:             outturn.Tool{Name: "nput", Version: "0.9.0"},
+		Command:          "apply",
+		Status:           outturn.StatusSuccess,
+		DryRun:           false,
+		StartedAt:        startedAt,
+		FinishedAt:       finishedAt,
+		WorkingDirectory: workingDirectory,
 		Results: []outturn.SubjectResult[PutInfo, *struct{}, *struct{}]{
 			{
 				Subject:    outturn.Subject{Name: "home"},
@@ -86,7 +92,7 @@ func ExampleEnvelope() {
 	// id 導出経路(JCS / sha256 / identity 値域)の変更を疑う。本命の担保は id_test.go
 	// / vectors_test.go(id-vectors 経由)にある。
 	// Output:
-	// {"specVersion":1,"tool":{"name":"nput","version":"0.9.0"},"command":"apply","status":"success","dryRun":false,"startedAt":"2026-07-22T09:00:00+09:00","finishedAt":"2026-07-22T09:00:01+09:00","results":[{"subject":{"name":"home"},"status":"success","startedAt":"2026-07-22T09:00:00+09:00","finishedAt":"2026-07-22T09:00:01+09:00","result":{"items":[{"id":"c5ec86d4056d73123e43df3257b6e36ba12e396ec4b0a8a63a7ba74429705ed6","kind":"file","status":"success","info":{"target":"/etc/hosts"}}]}}]}
+	// {"specVersion":1,"tool":{"name":"nput","version":"0.9.0"},"command":"apply","status":"success","dryRun":false,"startedAt":"2026-07-22T09:00:00+09:00","finishedAt":"2026-07-22T09:00:01+09:00","workingDirectory":"/home/alice/dotfiles","results":[{"subject":{"name":"home"},"status":"success","startedAt":"2026-07-22T09:00:00+09:00","finishedAt":"2026-07-22T09:00:01+09:00","result":{"items":[{"id":"c5ec86d4056d73123e43df3257b6e36ba12e396ec4b0a8a63a7ba74429705ed6","kind":"file","status":"success","info":{"target":"/etc/hosts"}}]}}]}
 }
 
 // ExampleEnvelope_multiCommand は multi-command producer(1 tool 内で command ごとに
@@ -105,6 +111,7 @@ func ExampleEnvelope() {
 func ExampleEnvelope_multiCommand() {
 	const startedAt = "2026-07-22T09:00:00+09:00"
 	const finishedAt = "2026-07-22T09:00:01+09:00"
+	const workingDirectory = "/home/alice/dotfiles"
 
 	// list-generations: Envelope.Info を GenerationsInfo で型付け、他スロットは *struct{}。
 	// 型追随のため Item[*struct{}] を 1 件入れる(kind=generation, key=home/42)。
@@ -113,14 +120,15 @@ func ExampleEnvelope_multiCommand() {
 		panic(err)
 	}
 	listGens := outturn.Envelope[*struct{}, *struct{}, *struct{}, GenerationsInfo]{
-		SpecVersion: 1,
-		Tool:        outturn.Tool{Name: "nput", Version: "0.9.0"},
-		Command:     "list-generations",
-		Status:      outturn.StatusSuccess,
-		DryRun:      false,
-		StartedAt:   startedAt,
-		FinishedAt:  finishedAt,
-		Info:        GenerationsInfo{Current: 42},
+		SpecVersion:      1,
+		Tool:             outturn.Tool{Name: "nput", Version: "0.9.0"},
+		Command:          "list-generations",
+		Status:           outturn.StatusSuccess,
+		DryRun:           false,
+		StartedAt:        startedAt,
+		FinishedAt:       finishedAt,
+		WorkingDirectory: workingDirectory,
+		Info:             GenerationsInfo{Current: 42},
 		Results: []outturn.SubjectResult[*struct{}, *struct{}, *struct{}]{
 			{
 				Subject:    outturn.Subject{Name: "home"},
@@ -138,14 +146,15 @@ func ExampleEnvelope_multiCommand() {
 
 	// init: Envelope.Info を InitInfo で型付け、他スロットは *struct{}。item は無し。
 	initCmd := outturn.Envelope[*struct{}, *struct{}, *struct{}, InitInfo]{
-		SpecVersion: 1,
-		Tool:        outturn.Tool{Name: "nput", Version: "0.9.0"},
-		Command:     "init",
-		Status:      outturn.StatusSuccess,
-		DryRun:      false,
-		StartedAt:   startedAt,
-		FinishedAt:  finishedAt,
-		Info:        InitInfo{Profile: "home"},
+		SpecVersion:      1,
+		Tool:             outturn.Tool{Name: "nput", Version: "0.9.0"},
+		Command:          "init",
+		Status:           outturn.StatusSuccess,
+		DryRun:           false,
+		StartedAt:        startedAt,
+		FinishedAt:       finishedAt,
+		WorkingDirectory: workingDirectory,
+		Info:             InitInfo{Profile: "home"},
 		Results: []outturn.SubjectResult[*struct{}, *struct{}, *struct{}]{
 			{
 				Subject:    outturn.Subject{Name: "home"},
@@ -168,6 +177,6 @@ func ExampleEnvelope_multiCommand() {
 		}
 	}
 	// Output:
-	// {"specVersion":1,"tool":{"name":"nput","version":"0.9.0"},"command":"list-generations","status":"success","dryRun":false,"startedAt":"2026-07-22T09:00:00+09:00","finishedAt":"2026-07-22T09:00:01+09:00","info":{"current":42},"results":[{"subject":{"name":"home"},"status":"success","startedAt":"2026-07-22T09:00:00+09:00","finishedAt":"2026-07-22T09:00:01+09:00","result":{"items":[{"id":"956954835debb292ce0463552f17d91098b9003b48af2b11ca5c7c46041d1225","kind":"generation","status":"success"}]}}]}
-	// {"specVersion":1,"tool":{"name":"nput","version":"0.9.0"},"command":"init","status":"success","dryRun":false,"startedAt":"2026-07-22T09:00:00+09:00","finishedAt":"2026-07-22T09:00:01+09:00","info":{"profile":"home"},"results":[{"subject":{"name":"home"},"status":"success","startedAt":"2026-07-22T09:00:00+09:00","finishedAt":"2026-07-22T09:00:01+09:00","result":{"items":[]}}]}
+	// {"specVersion":1,"tool":{"name":"nput","version":"0.9.0"},"command":"list-generations","status":"success","dryRun":false,"startedAt":"2026-07-22T09:00:00+09:00","finishedAt":"2026-07-22T09:00:01+09:00","workingDirectory":"/home/alice/dotfiles","info":{"current":42},"results":[{"subject":{"name":"home"},"status":"success","startedAt":"2026-07-22T09:00:00+09:00","finishedAt":"2026-07-22T09:00:01+09:00","result":{"items":[{"id":"956954835debb292ce0463552f17d91098b9003b48af2b11ca5c7c46041d1225","kind":"generation","status":"success"}]}}]}
+	// {"specVersion":1,"tool":{"name":"nput","version":"0.9.0"},"command":"init","status":"success","dryRun":false,"startedAt":"2026-07-22T09:00:00+09:00","finishedAt":"2026-07-22T09:00:01+09:00","workingDirectory":"/home/alice/dotfiles","info":{"profile":"home"},"results":[{"subject":{"name":"home"},"status":"success","startedAt":"2026-07-22T09:00:00+09:00","finishedAt":"2026-07-22T09:00:01+09:00","result":{"items":[]}}]}
 }

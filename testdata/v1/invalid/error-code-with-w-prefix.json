@@ -9,6 +9,7 @@
   "dryRun": false,
   "startedAt": "2026-07-07T22:20:00+09:00",
   "finishedAt": "2026-07-07T22:20:00+09:00",
+  "workingDirectory": "/home/alice/dotfiles",
   "errors": [
     {
       "code": "W_NPUT_FOREIGN_SYMLINK",

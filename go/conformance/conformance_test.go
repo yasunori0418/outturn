@@ -87,6 +87,7 @@ func TestFormatAssertionRejectsBadDateTime(t *testing.T) {
   "dryRun": false,
   "startedAt": %q,
   "finishedAt": %q,
+  "workingDirectory": "/home/alice/dotfiles",
   "results": [
     {
       "subject": { "name": "home" },

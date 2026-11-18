@@ -9,6 +9,7 @@
   "dryRun": false,
   "startedAt": "not-a-date",
   "finishedAt": "2026-07-05T12:34:58+09:00",
+  "workingDirectory": "/home/alice/dotfiles",
   "results": [
     {
       "subject": {
