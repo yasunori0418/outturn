@@ -1,7 +1,7 @@
 {
   "specVersion": 1,
   "tool": {
-    "name": "nput",
+    "name": "layat",
     "version": "0.9.0"
   },
   "command": "apply",
@@ -12,7 +12,7 @@
   "workingDirectory": "/home/alice/dotfiles",
   "warnings": [
     {
-      "code": "W_NPUT_DEPRECATED_FLAG",
+      "code": "W_LAYAT_DEPRECATED_FLAG",
       "message": "--force is deprecated; use --overwrite",
       "detail": {
         "flag": "--force"
@@ -29,7 +29,7 @@
       "finishedAt": "2026-07-07T22:10:02+09:00",
       "warnings": [
         {
-          "code": "W_NPUT_PROFILE_LEGACY_LAYOUT",
+          "code": "W_LAYAT_PROFILE_LEGACY_LAYOUT",
           "message": "profile uses legacy layout"
         }
       ],
@@ -42,8 +42,8 @@
             "status": "success",
             "warnings": [
               {
-                "code": "W_NPUT_FOREIGN_SYMLINK",
-                "message": "existing symlink was not created by nput"
+                "code": "W_LAYAT_FOREIGN_SYMLINK",
+                "message": "existing symlink was not created by layat"
               }
             ]
           }

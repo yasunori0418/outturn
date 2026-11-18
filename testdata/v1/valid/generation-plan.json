@@ -1,7 +1,7 @@
 {
   "specVersion": 1,
   "tool": {
-    "name": "nput",
+    "name": "layat",
     "version": "0.9.0"
   },
   "command": "plan",

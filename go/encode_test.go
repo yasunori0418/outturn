@@ -46,7 +46,7 @@ func goldenEnvelopes() map[string]rawEnvelope {
 	return map[string]rawEnvelope{
 		"apply-partial-failure-applied-changes.json": {
 			SpecVersion:      1,
-			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Tool:             Tool{Name: "layat", Version: "0.9.0"},
 			Command:          "apply",
 			Status:           StatusError,
 			DryRun:           false,
@@ -75,7 +75,7 @@ func goldenEnvelopes() map[string]rawEnvelope {
 
 		"apply-partial-failure.json": {
 			SpecVersion:      1,
-			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Tool:             Tool{Name: "layat", Version: "0.9.0"},
 			Command:          "apply",
 			Status:           StatusError,
 			StartedAt:        "2026-07-05T12:34:56+09:00",
@@ -90,7 +90,7 @@ func goldenEnvelopes() map[string]rawEnvelope {
 					Result: Result[json.RawMessage, json.RawMessage, json.RawMessage]{
 						Items: []Item[json.RawMessage]{
 							{ID: idZshrc, Kind: "entry", Label: ".zshrc", Status: ItemSuccess, Info: rawMsg(infoZshrc)},
-							{ID: idInitLua, Kind: "entry", Label: "init.lua", Status: ItemFailed, Error: &Error{Code: "E_NPUT_COLLISION", Message: "target already exists"}},
+							{ID: idInitLua, Kind: "entry", Label: "init.lua", Status: ItemFailed, Error: &Error{Code: "E_LAYAT_COLLISION", Message: "target already exists"}},
 						},
 						Changes: []Change[json.RawMessage]{
 							{Kind: ChangeModify, ItemID: idZshrc, Reversible: true, Info: rawMsg(changeZshrc)},
@@ -103,7 +103,7 @@ func goldenEnvelopes() map[string]rawEnvelope {
 
 		"apply-success.json": {
 			SpecVersion:      1,
-			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Tool:             Tool{Name: "layat", Version: "0.9.0"},
 			Command:          "apply",
 			Status:           StatusSuccess,
 			StartedAt:        "2026-07-05T12:34:56+09:00",
@@ -131,7 +131,7 @@ func goldenEnvelopes() map[string]rawEnvelope {
 
 		"check-success.json": {
 			SpecVersion:      1,
-			Tool:             Tool{Name: "nboot", Version: "0.1.0"},
+			Tool:             Tool{Name: "example", Version: "0.1.0"},
 			Command:          "check",
 			Status:           StatusSuccess,
 			DryRun:           true,
@@ -156,7 +156,7 @@ func goldenEnvelopes() map[string]rawEnvelope {
 		// Results を nil のまま構築する。MarshalJSON が [] へ正規化しなければ null になり失敗する。
 		"empty-results.json": {
 			SpecVersion:      1,
-			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Tool:             Tool{Name: "layat", Version: "0.9.0"},
 			Command:          "apply",
 			Status:           StatusSuccess,
 			StartedAt:        "2026-07-05T12:34:56+09:00",
@@ -190,7 +190,7 @@ func goldenEnvelopes() map[string]rawEnvelope {
 
 		"enumeration-error.json": {
 			SpecVersion:      1,
-			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Tool:             Tool{Name: "layat", Version: "0.9.0"},
 			Command:          "apply",
 			Status:           StatusError,
 			StartedAt:        "2026-07-05T12:34:56+09:00",
@@ -201,7 +201,7 @@ func goldenEnvelopes() map[string]rawEnvelope {
 
 		"envelope-info.json": {
 			SpecVersion:      1,
-			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Tool:             Tool{Name: "layat", Version: "0.9.0"},
 			Command:          "apply",
 			Status:           StatusSuccess,
 			StartedAt:        "2026-07-07T22:00:00+09:00",
@@ -226,14 +226,14 @@ func goldenEnvelopes() map[string]rawEnvelope {
 
 		"envelope-warnings.json": {
 			SpecVersion:      1,
-			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Tool:             Tool{Name: "layat", Version: "0.9.0"},
 			Command:          "apply",
 			Status:           StatusSuccess,
 			StartedAt:        "2026-07-07T22:10:00+09:00",
 			FinishedAt:       "2026-07-07T22:10:02+09:00",
 			WorkingDirectory: "/home/alice/dotfiles",
 			Warnings: []Warning{
-				{Code: "W_NPUT_DEPRECATED_FLAG", Message: "--force is deprecated; use --overwrite", Detail: map[string]any{"flag": "--force"}},
+				{Code: "W_LAYAT_DEPRECATED_FLAG", Message: "--force is deprecated; use --overwrite", Detail: map[string]any{"flag": "--force"}},
 			},
 			Results: []SubjectResult[json.RawMessage, json.RawMessage, json.RawMessage]{
 				{
@@ -241,10 +241,10 @@ func goldenEnvelopes() map[string]rawEnvelope {
 					Status:     StatusSuccess,
 					StartedAt:  "2026-07-07T22:10:00+09:00",
 					FinishedAt: "2026-07-07T22:10:02+09:00",
-					Warnings:   []Warning{{Code: "W_NPUT_PROFILE_LEGACY_LAYOUT", Message: "profile uses legacy layout"}},
+					Warnings:   []Warning{{Code: "W_LAYAT_PROFILE_LEGACY_LAYOUT", Message: "profile uses legacy layout"}},
 					Result: Result[json.RawMessage, json.RawMessage, json.RawMessage]{
 						Items: []Item[json.RawMessage]{
-							{ID: idZshrc, Kind: "entry", Label: ".zshrc", Status: ItemSuccess, Warnings: []Warning{{Code: "W_NPUT_FOREIGN_SYMLINK", Message: "existing symlink was not created by nput"}}},
+							{ID: idZshrc, Kind: "entry", Label: ".zshrc", Status: ItemSuccess, Warnings: []Warning{{Code: "W_LAYAT_FOREIGN_SYMLINK", Message: "existing symlink was not created by layat"}}},
 						},
 					},
 				},
@@ -253,7 +253,7 @@ func goldenEnvelopes() map[string]rawEnvelope {
 
 		"generation-apply.json": {
 			SpecVersion:      1,
-			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Tool:             Tool{Name: "layat", Version: "0.9.0"},
 			Command:          "apply",
 			Status:           StatusSuccess,
 			StartedAt:        "2026-07-07T21:00:00+09:00",
@@ -295,7 +295,7 @@ func goldenEnvelopes() map[string]rawEnvelope {
 
 		"generation-plan.json": {
 			SpecVersion:      1,
-			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Tool:             Tool{Name: "layat", Version: "0.9.0"},
 			Command:          "plan",
 			Status:           StatusSuccess,
 			DryRun:           true,
@@ -323,7 +323,7 @@ func goldenEnvelopes() map[string]rawEnvelope {
 
 		"multi-subject-partial-failure.json": {
 			SpecVersion:      1,
-			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Tool:             Tool{Name: "layat", Version: "0.9.0"},
 			Command:          "apply",
 			Status:           StatusError,
 			StartedAt:        "2026-07-05T12:34:56+09:00",
@@ -348,7 +348,7 @@ func goldenEnvelopes() map[string]rawEnvelope {
 					FinishedAt: "2026-07-05T12:35:04+09:00",
 					Result: Result[json.RawMessage, json.RawMessage, json.RawMessage]{
 						Items: []Item[json.RawMessage]{
-							{ID: idInitLua, Kind: "entry", Label: "init.lua", Status: ItemFailed, Error: &Error{Code: "E_NPUT_COLLISION", Message: "target already exists"}},
+							{ID: idInitLua, Kind: "entry", Label: "init.lua", Status: ItemFailed, Error: &Error{Code: "E_LAYAT_COLLISION", Message: "target already exists"}},
 						},
 					},
 				},
@@ -357,7 +357,7 @@ func goldenEnvelopes() map[string]rawEnvelope {
 
 		"multi-subject-success.json": {
 			SpecVersion:      1,
-			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Tool:             Tool{Name: "layat", Version: "0.9.0"},
 			Command:          "apply",
 			Status:           StatusSuccess,
 			StartedAt:        "2026-07-05T12:34:56+09:00",
@@ -393,7 +393,7 @@ func goldenEnvelopes() map[string]rawEnvelope {
 
 		"plan-dryrun.json": {
 			SpecVersion:      1,
-			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Tool:             Tool{Name: "layat", Version: "0.9.0"},
 			Command:          "plan",
 			Status:           StatusSuccess,
 			DryRun:           true,
@@ -423,7 +423,7 @@ func goldenEnvelopes() map[string]rawEnvelope {
 		// result.items を nil のまま構築する。MarshalJSON が [] へ正規化しなければ null になり失敗する。
 		"subject-error-lock.json": {
 			SpecVersion:      1,
-			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Tool:             Tool{Name: "layat", Version: "0.9.0"},
 			Command:          "apply",
 			Status:           StatusError,
 			StartedAt:        "2026-07-05T12:34:56+09:00",
@@ -488,7 +488,7 @@ func TestMarshalNormalizesNilArrays(t *testing.T) {
 	// Results / Items 双方を nil のまま構築する。
 	env := rawEnvelope{
 		SpecVersion: 1,
-		Tool:        Tool{Name: "nput", Version: "0.9.0"},
+		Tool:        Tool{Name: "layat", Version: "0.9.0"},
 		Command:     "apply",
 		Status:      StatusSuccess,
 		StartedAt:   "2026-07-05T12:34:56+09:00",
