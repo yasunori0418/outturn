@@ -9,6 +9,7 @@
   "dryRun": false,
   "startedAt": "2026-07-07T22:10:00+09:00",
   "finishedAt": "2026-07-07T22:10:02+09:00",
+  "workingDirectory": "/home/alice/dotfiles",
   "warnings": [
     {
       "code": "W_NPUT_DEPRECATED_FLAG",

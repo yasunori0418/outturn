@@ -100,18 +100,21 @@ type SubjectResult[TItem, TChange, TInfo any] struct {
 
 // Envelope の Info は実行全体のツール固有情報（主体に紐づかないもの）。
 // 主体ごとのツール固有情報は Result.Info に置く。
+// WorkingDirectory は実行時のプロセスの作業ディレクトリの観測記録で、絶対パスを入れる。
+// 必須のため omitempty を付けない(spec §2)。
 type Envelope[TItem, TChange, TInfo, TEnvInfo any] struct {
-	SpecVersion int                                    `json:"specVersion"`
-	Tool        Tool                                   `json:"tool"`
-	Command     string                                 `json:"command"`
-	Status      Status                                 `json:"status"`
-	DryRun      bool                                   `json:"dryRun"`
-	StartedAt   string                                 `json:"startedAt"`
-	FinishedAt  string                                 `json:"finishedAt"`
-	Errors      []Error                                `json:"errors,omitempty"`
-	Warnings    []Warning                              `json:"warnings,omitempty"`
-	Info        TEnvInfo                               `json:"info,omitempty"`
-	Results     []SubjectResult[TItem, TChange, TInfo] `json:"results"`
+	SpecVersion      int                                    `json:"specVersion"`
+	Tool             Tool                                   `json:"tool"`
+	Command          string                                 `json:"command"`
+	Status           Status                                 `json:"status"`
+	DryRun           bool                                   `json:"dryRun"`
+	StartedAt        string                                 `json:"startedAt"`
+	FinishedAt       string                                 `json:"finishedAt"`
+	WorkingDirectory string                                 `json:"workingDirectory"`
+	Errors           []Error                                `json:"errors,omitempty"`
+	Warnings         []Warning                              `json:"warnings,omitempty"`
+	Info             TEnvInfo                               `json:"info,omitempty"`
+	Results          []SubjectResult[TItem, TChange, TInfo] `json:"results"`
 }
 
 // MarshalJSON: 必須配列の nil を [] に正規化する。

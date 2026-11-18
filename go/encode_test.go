@@ -43,13 +43,14 @@ func intPtr(i int) *int               { return &i }
 func goldenEnvelopes() map[string]rawEnvelope {
 	return map[string]rawEnvelope{
 		"apply-partial-failure-applied-changes.json": {
-			SpecVersion: 1,
-			Tool:        Tool{Name: "nput", Version: "0.9.0"},
-			Command:     "apply",
-			Status:      StatusError,
-			DryRun:      false,
-			StartedAt:   "2026-07-07T09:15:00+09:00",
-			FinishedAt:  "2026-07-07T09:15:03+09:00",
+			SpecVersion:      1,
+			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Command:          "apply",
+			Status:           StatusError,
+			DryRun:           false,
+			StartedAt:        "2026-07-07T09:15:00+09:00",
+			FinishedAt:       "2026-07-07T09:15:03+09:00",
+			WorkingDirectory: "/home/alice/dotfiles",
 			Results: []SubjectResult[json.RawMessage, json.RawMessage, json.RawMessage]{
 				{
 					Subject:    Subject{Name: "home"},
@@ -71,12 +72,13 @@ func goldenEnvelopes() map[string]rawEnvelope {
 		},
 
 		"apply-partial-failure.json": {
-			SpecVersion: 1,
-			Tool:        Tool{Name: "nput", Version: "0.9.0"},
-			Command:     "apply",
-			Status:      StatusError,
-			StartedAt:   "2026-07-05T12:34:56+09:00",
-			FinishedAt:  "2026-07-05T12:34:58+09:00",
+			SpecVersion:      1,
+			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Command:          "apply",
+			Status:           StatusError,
+			StartedAt:        "2026-07-05T12:34:56+09:00",
+			FinishedAt:       "2026-07-05T12:34:58+09:00",
+			WorkingDirectory: "/home/alice/dotfiles",
 			Results: []SubjectResult[json.RawMessage, json.RawMessage, json.RawMessage]{
 				{
 					Subject:    Subject{Name: "home"},
@@ -98,12 +100,13 @@ func goldenEnvelopes() map[string]rawEnvelope {
 		},
 
 		"apply-success.json": {
-			SpecVersion: 1,
-			Tool:        Tool{Name: "nput", Version: "0.9.0"},
-			Command:     "apply",
-			Status:      StatusSuccess,
-			StartedAt:   "2026-07-05T12:34:56+09:00",
-			FinishedAt:  "2026-07-05T12:34:58+09:00",
+			SpecVersion:      1,
+			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Command:          "apply",
+			Status:           StatusSuccess,
+			StartedAt:        "2026-07-05T12:34:56+09:00",
+			FinishedAt:       "2026-07-05T12:34:58+09:00",
+			WorkingDirectory: "/home/alice/dotfiles",
 			Results: []SubjectResult[json.RawMessage, json.RawMessage, json.RawMessage]{
 				{
 					Subject:    Subject{Name: "home"},
@@ -125,13 +128,14 @@ func goldenEnvelopes() map[string]rawEnvelope {
 		},
 
 		"check-success.json": {
-			SpecVersion: 1,
-			Tool:        Tool{Name: "nboot", Version: "0.1.0"},
-			Command:     "check",
-			Status:      StatusSuccess,
-			DryRun:      true,
-			StartedAt:   "2026-07-05T12:34:56+09:00",
-			FinishedAt:  "2026-07-05T12:34:58+09:00",
+			SpecVersion:      1,
+			Tool:             Tool{Name: "nboot", Version: "0.1.0"},
+			Command:          "check",
+			Status:           StatusSuccess,
+			DryRun:           true,
+			StartedAt:        "2026-07-05T12:34:56+09:00",
+			FinishedAt:       "2026-07-05T12:34:58+09:00",
+			WorkingDirectory: "/home/alice/dotfiles",
 			Results: []SubjectResult[json.RawMessage, json.RawMessage, json.RawMessage]{
 				{
 					Subject:    Subject{Name: "system"},
@@ -149,32 +153,59 @@ func goldenEnvelopes() map[string]rawEnvelope {
 
 		// Results を nil のまま構築する。MarshalJSON が [] へ正規化しなければ null になり失敗する。
 		"empty-results.json": {
-			SpecVersion: 1,
-			Tool:        Tool{Name: "nput", Version: "0.9.0"},
-			Command:     "apply",
-			Status:      StatusSuccess,
-			StartedAt:   "2026-07-05T12:34:56+09:00",
-			FinishedAt:  "2026-07-05T12:34:56+09:00",
+			SpecVersion:      1,
+			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Command:          "apply",
+			Status:           StatusSuccess,
+			StartedAt:        "2026-07-05T12:34:56+09:00",
+			FinishedAt:       "2026-07-05T12:34:56+09:00",
+			WorkingDirectory: "/home/alice/dotfiles",
+		},
+
+		"implicit-input.json": {
+			SpecVersion:      1,
+			Tool:             Tool{Name: "layat", Version: "0.1.0"},
+			Command:          "apply",
+			Status:           StatusSuccess,
+			StartedAt:        "2026-07-05T12:34:56+09:00",
+			FinishedAt:       "2026-07-05T12:34:58+09:00",
+			WorkingDirectory: "/home/alice/dotfiles",
+			Info:             rawMsg(`{"entrypoint":"/home/alice/dotfiles/entry.nix","generator":"home-manager"}`),
+			Results: []SubjectResult[json.RawMessage, json.RawMessage, json.RawMessage]{
+				{
+					Subject:    Subject{Name: "home"},
+					Status:     StatusSuccess,
+					StartedAt:  "2026-07-05T12:34:56+09:00",
+					FinishedAt: "2026-07-05T12:34:58+09:00",
+					Result: Result[json.RawMessage, json.RawMessage, json.RawMessage]{
+						Items: []Item[json.RawMessage]{
+							{ID: idZshrc, Kind: "entry", Label: ".zshrc", Status: ItemSuccess, Info: rawMsg(infoZshrc)},
+						},
+					},
+				},
+			},
 		},
 
 		"enumeration-error.json": {
-			SpecVersion: 1,
-			Tool:        Tool{Name: "nput", Version: "0.9.0"},
-			Command:     "apply",
-			Status:      StatusError,
-			StartedAt:   "2026-07-05T12:34:56+09:00",
-			FinishedAt:  "2026-07-05T12:34:56+09:00",
-			Errors:      []Error{{Code: "E_IO", Message: "cannot read the profile base directory"}},
+			SpecVersion:      1,
+			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Command:          "apply",
+			Status:           StatusError,
+			StartedAt:        "2026-07-05T12:34:56+09:00",
+			FinishedAt:       "2026-07-05T12:34:56+09:00",
+			WorkingDirectory: "/home/alice/dotfiles",
+			Errors:           []Error{{Code: "E_IO", Message: "cannot read the profile base directory"}},
 		},
 
 		"envelope-info.json": {
-			SpecVersion: 1,
-			Tool:        Tool{Name: "nput", Version: "0.9.0"},
-			Command:     "apply",
-			Status:      StatusSuccess,
-			StartedAt:   "2026-07-07T22:00:00+09:00",
-			FinishedAt:  "2026-07-07T22:00:03+09:00",
-			Info:        rawMsg(`{"configSource":"git+https://example.com/dotfiles.git","cacheHits":12}`),
+			SpecVersion:      1,
+			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Command:          "apply",
+			Status:           StatusSuccess,
+			StartedAt:        "2026-07-07T22:00:00+09:00",
+			FinishedAt:       "2026-07-07T22:00:03+09:00",
+			WorkingDirectory: "/home/alice/dotfiles",
+			Info:             rawMsg(`{"configSource":"git+https://example.com/dotfiles.git","cacheHits":12}`),
 			Results: []SubjectResult[json.RawMessage, json.RawMessage, json.RawMessage]{
 				{
 					Subject:    Subject{Name: "home"},
@@ -192,12 +223,13 @@ func goldenEnvelopes() map[string]rawEnvelope {
 		},
 
 		"envelope-warnings.json": {
-			SpecVersion: 1,
-			Tool:        Tool{Name: "nput", Version: "0.9.0"},
-			Command:     "apply",
-			Status:      StatusSuccess,
-			StartedAt:   "2026-07-07T22:10:00+09:00",
-			FinishedAt:  "2026-07-07T22:10:02+09:00",
+			SpecVersion:      1,
+			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Command:          "apply",
+			Status:           StatusSuccess,
+			StartedAt:        "2026-07-07T22:10:00+09:00",
+			FinishedAt:       "2026-07-07T22:10:02+09:00",
+			WorkingDirectory: "/home/alice/dotfiles",
 			Warnings: []Warning{
 				{Code: "W_NPUT_DEPRECATED_FLAG", Message: "--force is deprecated; use --overwrite", Detail: map[string]any{"flag": "--force"}},
 			},
@@ -218,12 +250,13 @@ func goldenEnvelopes() map[string]rawEnvelope {
 		},
 
 		"generation-apply.json": {
-			SpecVersion: 1,
-			Tool:        Tool{Name: "nput", Version: "0.9.0"},
-			Command:     "apply",
-			Status:      StatusSuccess,
-			StartedAt:   "2026-07-07T21:00:00+09:00",
-			FinishedAt:  "2026-07-07T21:00:02+09:00",
+			SpecVersion:      1,
+			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Command:          "apply",
+			Status:           StatusSuccess,
+			StartedAt:        "2026-07-07T21:00:00+09:00",
+			FinishedAt:       "2026-07-07T21:00:02+09:00",
+			WorkingDirectory: "/home/alice/dotfiles",
 			Results: []SubjectResult[json.RawMessage, json.RawMessage, json.RawMessage]{
 				{
 					Subject:    Subject{Name: "home"},
@@ -259,13 +292,14 @@ func goldenEnvelopes() map[string]rawEnvelope {
 		},
 
 		"generation-plan.json": {
-			SpecVersion: 1,
-			Tool:        Tool{Name: "nput", Version: "0.9.0"},
-			Command:     "plan",
-			Status:      StatusSuccess,
-			DryRun:      true,
-			StartedAt:   "2026-07-07T21:10:00+09:00",
-			FinishedAt:  "2026-07-07T21:10:01+09:00",
+			SpecVersion:      1,
+			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Command:          "plan",
+			Status:           StatusSuccess,
+			DryRun:           true,
+			StartedAt:        "2026-07-07T21:10:00+09:00",
+			FinishedAt:       "2026-07-07T21:10:01+09:00",
+			WorkingDirectory: "/home/alice/dotfiles",
 			Results: []SubjectResult[json.RawMessage, json.RawMessage, json.RawMessage]{
 				{
 					Subject:    Subject{Name: "home"},
@@ -286,12 +320,13 @@ func goldenEnvelopes() map[string]rawEnvelope {
 		},
 
 		"multi-subject-partial-failure.json": {
-			SpecVersion: 1,
-			Tool:        Tool{Name: "nput", Version: "0.9.0"},
-			Command:     "apply",
-			Status:      StatusError,
-			StartedAt:   "2026-07-05T12:34:56+09:00",
-			FinishedAt:  "2026-07-05T12:35:04+09:00",
+			SpecVersion:      1,
+			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Command:          "apply",
+			Status:           StatusError,
+			StartedAt:        "2026-07-05T12:34:56+09:00",
+			FinishedAt:       "2026-07-05T12:35:04+09:00",
+			WorkingDirectory: "/home/alice/dotfiles",
 			Results: []SubjectResult[json.RawMessage, json.RawMessage, json.RawMessage]{
 				{
 					Subject:    Subject{Name: "home"},
@@ -319,12 +354,13 @@ func goldenEnvelopes() map[string]rawEnvelope {
 		},
 
 		"multi-subject-success.json": {
-			SpecVersion: 1,
-			Tool:        Tool{Name: "nput", Version: "0.9.0"},
-			Command:     "apply",
-			Status:      StatusSuccess,
-			StartedAt:   "2026-07-05T12:34:56+09:00",
-			FinishedAt:  "2026-07-05T12:35:04+09:00",
+			SpecVersion:      1,
+			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Command:          "apply",
+			Status:           StatusSuccess,
+			StartedAt:        "2026-07-05T12:34:56+09:00",
+			FinishedAt:       "2026-07-05T12:35:04+09:00",
+			WorkingDirectory: "/home/alice/dotfiles",
 			Results: []SubjectResult[json.RawMessage, json.RawMessage, json.RawMessage]{
 				{
 					Subject:    Subject{Name: "home"},
@@ -354,13 +390,14 @@ func goldenEnvelopes() map[string]rawEnvelope {
 		},
 
 		"plan-dryrun.json": {
-			SpecVersion: 1,
-			Tool:        Tool{Name: "nput", Version: "0.9.0"},
-			Command:     "plan",
-			Status:      StatusSuccess,
-			DryRun:      true,
-			StartedAt:   "2026-07-05T12:34:56+09:00",
-			FinishedAt:  "2026-07-05T12:34:58+09:00",
+			SpecVersion:      1,
+			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Command:          "plan",
+			Status:           StatusSuccess,
+			DryRun:           true,
+			StartedAt:        "2026-07-05T12:34:56+09:00",
+			FinishedAt:       "2026-07-05T12:34:58+09:00",
+			WorkingDirectory: "/home/alice/dotfiles",
 			Results: []SubjectResult[json.RawMessage, json.RawMessage, json.RawMessage]{
 				{
 					Subject:    Subject{Name: "home"},
@@ -383,12 +420,13 @@ func goldenEnvelopes() map[string]rawEnvelope {
 
 		// result.items を nil のまま構築する。MarshalJSON が [] へ正規化しなければ null になり失敗する。
 		"subject-error-lock.json": {
-			SpecVersion: 1,
-			Tool:        Tool{Name: "nput", Version: "0.9.0"},
-			Command:     "apply",
-			Status:      StatusError,
-			StartedAt:   "2026-07-05T12:34:56+09:00",
-			FinishedAt:  "2026-07-05T12:34:58+09:00",
+			SpecVersion:      1,
+			Tool:             Tool{Name: "nput", Version: "0.9.0"},
+			Command:          "apply",
+			Status:           StatusError,
+			StartedAt:        "2026-07-05T12:34:56+09:00",
+			FinishedAt:       "2026-07-05T12:34:58+09:00",
+			WorkingDirectory: "/home/alice/dotfiles",
 			Results: []SubjectResult[json.RawMessage, json.RawMessage, json.RawMessage]{
 				{
 					Subject:    Subject{Name: "home"},

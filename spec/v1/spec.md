@@ -22,6 +22,7 @@
   "dryRun": false,
   "startedAt": "2026-07-05T12:34:56+09:00",   // RFC 3339
   "finishedAt": "2026-07-05T12:34:58+09:00",
+  "workingDirectory": "/home/alice/dotfiles", // 実行時の作業ディレクトリ（絶対パス）
   "errors": [ Error, ... ],                   // 主体列挙・解決の前段エラーのみ
   "warnings": [ Warning, ... ],               // 実行全体の警告（任意）
   "info": { },                                // ツール固有（実行全体。任意）
@@ -36,6 +37,7 @@
 - `dryRun` はエンベロープ全体の性質で、`results` の全主体で均一とする（MUST）。`tool` / `command` / `specVersion` もトップレベルにのみ置き、主体ごとに変えない
 - `dryRun: true` の出力は、`dryRun` の値以外において apply と同一スキーマでなければならない（MUST）
 - `startedAt` / `finishedAt` は実行の開始・終了時刻を表す RFC 3339 の date-time 文字列でなければならない（MUST）。日付と時刻は `T`（または `t`）で区切り、タイムゾーンオフセット（`Z` または `±hh:mm`）を伴わなければならない（MUST）。`subjectResult` の `startedAt` / `finishedAt`（各主体の実行時刻）も同じ制約に従う。schema は `format: date-time` でこれを表現し、適合検証は format を assertion として評価する（§8）
+- `workingDirectory` は必須（MUST）で、値は絶対パスでなければならない（MUST）。値は実行時のプロセスの作業ディレクトリの観測記録であり、作業ディレクトリが結果に影響したことの宣言ではない。結果への影響の有無によらず常に出力する。入力の解決の起点を切り替えるツール（`-C dir` の類）は切り替え後の値を出力しなければならない（MUST）。シンボリックリンクの解決を含む正規化は求めない。schema は空でない文字列であることだけを検査し、絶対パスであることは本文のこの MUST で定める。絶対パスであることと切り替え後の値であることの MUST は、§8 (2) のリント検査の対象外である（→ ADR-0028）
 - トップレベル `errors[]` には**主体の列挙・解決の前段で起きる全体エラーのみ**を置く（入力 parse 失敗・specVersion 不能・主体列挙自体の失敗等）。解決済み主体に紐づくエラーを置いてはならない（MUST NOT）
 - トップレベル `warnings[]` には**実行全体に関わる警告**（主体に紐づかないもの）を置いてよい（MAY）。解決済み主体に紐づく警告は `subjectResult.warnings` に、処理単位に紐づく警告は `item.warnings` に置く。warning は `status` の集約に影響しない
 - warning の `code` は `W_` prefix、error の `code` は `E_` prefix でなければならない（MUST・§6 の二層命名）。schema は `$defs/warning` / `$defs/error` の pattern でこれを強制する
@@ -200,4 +202,9 @@ identity（`kind` と `key`）を構成する JSON 値は次の値域に限る�
     - status と errors / item の整合（§2）: `status: "error"` は `errors[]` 非空、または `status: "error"` の主体（`item.status: "failed"` を含む主体）を伴う。`status: "success"` はその否定（`errors[]` 空かつ error 主体なし）。`subjectResult` も同型
     - `changes[].itemId` の同一 result 内参照整合（§5）: `itemId` は同じ `result` の `items[].id` を指す。`result` を跨いだ参照・不在の id 参照を含めてはならない
     - 一意性（§5・producer MUST）: `subject.name` は 1 エンベロープ内で一意、`item.id` は 1 `result` 内で一意
-- 適合するツールは standalone で動作しなければならない（MUST）: 入力は stdin の JSON か明示引数のみとし、状態・設定の暗黙探索、特定ディストリビューション・特定フレームワークへの依存をしない
+- 適合するツールは standalone で動作しなければならない（MUST）。standalone とは次の全てを満たすことをいう（→ ADR-0028）
+    - 特定ディストリビューション・特定フレームワークに依存しない（MUST）
+    - 入力を stdin の JSON か明示引数だけで全て与えて実行できる経路を持つ（MUST）
+    - 暗黙の入力を使った実行では、その解決結果（ファイルは絶対パス、設定値はその値）をトップレベル `info` に記録しなければならない（MUST）。主体ごとに解決結果が違う場合は `result.info` に記録する。記録のキーと形はツールが決め、環境変数の名前の記録は求めない。記録した解決結果にも §3 の機微情報の扱いを従来どおり適用する
+- 暗黙の入力とは明示引数か stdin で与えられる入力を、与えられなかったときにツールが自分で解決したものを指す。作業ディレクトリ起点の探索・環境変数・既定パスの設定ファイルのどの経路で解決したものも同じ扱いとする
+- 暗黙の入力の解決結果を `info` に記録する義務は、(2) のリント検査の対象外である。何を暗黙に解決したかはツールしか知らず、エンベロープだけでは判定できないためである

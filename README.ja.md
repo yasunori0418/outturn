@@ -65,6 +65,7 @@ outturn/
   "status": "success",            // "success" | "error"（2 値のみ）
   "dryRun": false,                // plan でもスキーマは apply と同一
   "startedAt": "...", "finishedAt": "...",
+  "workingDirectory": "/home/alice/dotfiles", // 実行時の作業ディレクトリ（絶対パス）
   "errors": [],                   // 主体列挙・解決の前段の全体エラーのみ
   "results": [                    // 主体ごとに subjectResult 1 つ（0..N。--all 等で複数になる）
     {
@@ -89,7 +90,7 @@ item id は `sha256(JCS(identity))` で機械的に導出する。ツールが�
 
 1. **schema 検証**: 出力が `schema/v1/envelope.schema.json` を通過する
 2. **id-vectors 通過**: id 導出実装が `testdata/v1/id-vectors.json` の全ベクタで期待値と一致する
-3. **standalone**: 入力は stdin の JSON か明示引数のみ。状態・設定の暗黙探索をしない（詳細は spec §8）
+3. **standalone**: 入力を stdin の JSON か明示引数だけで全て与えて実行できる。暗黙の入力（作業ディレクトリ・環境変数・既定パスの設定ファイルからツールが解決した入力）を使った実行では、その解決結果をトップレベル `info` に記録する（詳細は spec §8）
 
 go module は両アーティファクトを embed している（正本とのバイト完全一致を CI が保証）。1. には `conformance.NewDefaultChecker()` がコンパイル済み checker を返し、2. には `outturn.IDVectorsV1()` がベクタ表を返すため、Go の consumer は vendored copy を持つ必要がない。
 

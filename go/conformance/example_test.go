@@ -33,6 +33,7 @@ func ExampleChecker_Check() {
   "dryRun": false,
   "startedAt": "2026-07-05T12:34:56+09:00",
   "finishedAt": "2026-07-05T12:34:56+09:00",
+  "workingDirectory": "/home/alice/dotfiles",
   "results": []
 }`)
 	if findings := chk.Check(envelopeJSON); len(findings) > 0 {

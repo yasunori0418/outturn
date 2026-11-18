@@ -4,6 +4,9 @@
 - 日付: 2026-07-07
 - 関連: `docs/concept.md`, `docs/ecosystem/overview.md`, `docs/ecosystem/distro-plan.md`, ADR-0004, ADR-0005, ADR-0011
 
+> **2026-11-18 改訂注記（ADR-0028）**: 本 ADR の決定のうち、入力 JSON の形の項で維持するとした spec §8 の standalone の入力の受け取り方の規律が対象。
+> 入力 JSON の形を outturn の領分外とする決定は不変。受け取り方の規律は「stdin の JSON か明示引数のみ」から、入力を stdin の JSON か明示引数だけで全て与えて実行できる経路を持ち、暗黙の入力を使った実行ではその解決結果を `info` に記録する規律に変わった（→ ADR-0028）。
+
 ## 背景
 
 concept.md は outturn を「stdout / stdin を通じて会話するための共通 JSON 規格」と述べ、distro-plan.md は横断規格を「世代表現・差分表現・結果エンベロープ」の 3 点と定義してきた。しかし spec v1 が実際に定義しているのは結果エンベロープ（差分表現 `changes[]` を含む）のみで、入力 JSON の形・世代表現・rollback 呼び出し規約・複数ツール集約の形状は存在しない。この不一致を放置すると、将来の作業者が「入力規格や世代表現は未実装の宿題」と誤読して規格を肥大させる方向に働き、M2（nboot）以降の実装が曖昧な契約の上で始まる。planned 5 ツールの出力シミュレーションによる再検査（2026-07-07・tracking #8）を受け、outturn の領分を確定する。

@@ -23,6 +23,9 @@ _Avoid_: plan 専用の別スキーマ・別 result 型。
 **errors[]**: 最上位のエラー配列。**主体の列挙・解決の前段で起きる全体エラーのみ**（入力 parse 失敗・specVersion 不能・主体列挙自体の失敗等）を置く。解決済み主体に紐づくエラーは `subjectResult.errors` に置く（→ ADR-0006, ADR-0011）。
 _Avoid_: 全 item エラーの集約ビューをここに持たせること; 解決済み主体の lock 取得失敗等をここに置くこと（subjectResult.errors が正）。
 
+**workingDirectory**: エンベロープ直下の必須フィールド。実行時のプロセスの作業ディレクトリの観測記録で、値は絶対パス。作業ディレクトリが結果に影響したことの宣言ではなく、影響の有無によらず常に出力する。入力の解決の起点を切り替えるツール（`-C dir` の類）は切り替え後の値を出す。シンボリックリンクの解決を含む正規化は求めない（→ ADR-0028）。
+_Avoid_: 作業ディレクトリを `info` に置くこと; 作業ディレクトリが結果に影響したときだけ出力すること。
+
 ### ペイロード
 
 **result**: 1 主体分の実行ペイロードのコンテナ。`items` / `changes` / `info` を持ち、各 subjectResult の下に 1 つ置かれる（→ ADR-0001, ADR-0011）。
@@ -80,7 +83,10 @@ _Avoid_: warning の code に `E_` prefix、error の code に `W_` prefix を�
 
 ### 適合
 
-**standalone**: 適合ツールの要件。入力は stdin の JSON か明示引数のみとし、状態・設定の暗黙探索や特定ディストリビューション・フレームワークへの依存をしない（→ `spec/v1/spec.md` §8）。
+**standalone**: 適合ツールの要件。特定ディストリビューション・フレームワークに依存せず、入力を stdin の JSON か明示引数だけで全て与えて実行できる経路を持つ。暗黙の入力を使った実行では、その解決結果をトップレベル `info`（主体ごとに違う場合は `result.info`）に記録する（→ `spec/v1/spec.md` §8, ADR-0028）。
+
+**暗黙の入力**: 明示引数か stdin で与えられる入力を、与えられなかったときにツールが自分で解決したもの。作業ディレクトリ起点の探索・環境変数・既定パスの設定ファイルのどの経路でも同じ扱い。standalone はこれを禁止せず、解決結果（ファイルは絶対パス、設定値はその値）の `info` への記録を求める。記録のキーと形はツールが決め、環境変数の名前の記録は求めない（→ ADR-0028）。
+_Avoid_: 「自動探索」「暗黙探索」; 解決結果を規格フィールドとして置くこと。
 
 **適合 (conformance)**: `schema/v1/` の JSON Schema 検証・schema で表現しきれない MUST のリント検査（status↔errors/item 整合・`changes[].itemId` の同一 result 内参照整合・`subject.name` / `item.id` の一意性）・`testdata/v1/id-vectors.json` の全ベクタ通過をもって判定する。schema 検証とリント検査の参照実装は Go（`go/conformance`、単一文書 CLI `outturn-validate`）（→ `spec/v1/spec.md` §8, ADR-0021, ADR-0023）。
 _Avoid_: schema で表現しきれない MUST を「schema を通れば適合」と見なして素通りさせること。

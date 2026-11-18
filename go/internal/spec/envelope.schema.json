@@ -5,7 +5,7 @@
   "description": "outturn 規格に適合する全ツールが stdout に出力する単一 JSON 文書の規格型。トップレベルは常に results[](主体ごとの結果)を持つ。producer 適合検証用(additionalProperties: false)。consumer は must-ignore 原則に従い未知フィールドを無視すること。",
   "type": "object",
   "additionalProperties": false,
-  "required": ["specVersion", "tool", "command", "status", "dryRun", "startedAt", "finishedAt", "results"],
+  "required": ["specVersion", "tool", "command", "status", "dryRun", "startedAt", "finishedAt", "workingDirectory", "results"],
   "properties": {
     "specVersion": { "type": "integer", "const": 1 },
     "tool": {
@@ -25,6 +25,11 @@
     "dryRun": { "type": "boolean" },
     "startedAt": { "type": "string", "format": "date-time" },
     "finishedAt": { "type": "string", "format": "date-time" },
+    "workingDirectory": {
+      "description": "実行時のプロセスの作業ディレクトリの観測記録。作業ディレクトリが結果に影響したことの宣言ではない。入力の解決の起点を切り替えるツールは切り替え後の値を出力する。値は絶対パスでなければならない。これは spec §2 の MUST で定め、schema は空でない文字列であることだけを検査する",
+      "type": "string",
+      "minLength": 1
+    },
     "errors": {
       "description": "主体の列挙・解決の前段で起きる全体エラーのみ(入力 parse 失敗・specVersion 不能・主体列挙自体の失敗等)。解決済み主体に紐づくエラーは subjectResult.errors に置く",
       "type": "array",
