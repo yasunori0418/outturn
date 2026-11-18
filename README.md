@@ -67,6 +67,7 @@ Every tool writes a single JSON document (the envelope) — and nothing else —
   "status": "success",            // "success" | "error" (only two values)
   "dryRun": false,                // a plan uses the same schema as apply
   "startedAt": "...", "finishedAt": "...",
+  "workingDirectory": "/home/alice/dotfiles", // the process's working directory at run time (absolute path)
   "errors": [],                   // only pre-enumeration whole-run errors
   "results": [                    // one subjectResult per subject (0..N; --all etc. yields many)
     {
@@ -91,7 +92,7 @@ A tool is outturn-conformant when:
 
 1. **Schema validation**: its output passes `schema/v1/envelope.schema.json`.
 2. **id-vectors**: its id-derivation implementation matches the expected values for every vector in `testdata/v1/id-vectors.json`.
-3. **standalone**: input comes only from stdin JSON or explicit arguments; it never implicitly discovers state or configuration (see spec §8).
+3. **standalone**: every input can be supplied through stdin JSON or explicit arguments alone; a run that uses implicit input (input the tool resolves itself from the working directory, environment variables, or a config file at a default path) records the resolved values in the top-level `info` (see spec §8).
 
 The Go module embeds both artifacts (byte-identical to the canonical files, enforced by CI): `conformance.NewDefaultChecker()` returns a ready-to-use checker for 1., and `outturn.IDVectorsV1()` exposes the vector table for 2., so Go consumers need no vendored copies.
 
