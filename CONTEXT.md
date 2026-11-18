@@ -45,7 +45,7 @@ _Avoid_: ツール固有フィールドを規格フィールドと同一階層�
 
 ### 複数主体（batch）と subject
 
-**batch**: 複数主体を 1 実行で扱う実行形態の**非公式呼称**（schema 上の判別子値ではない。判別子フィールド `mode` は廃止 → ADR-0013）。`results[]` に主体ごとの subjectResult を並べる。同一 tool・同一 command が構造的に保証される（複数ツールの束ねは ncompose の領分で別形状）（→ ADR-0011）。
+**batch**: 複数主体を 1 実行で扱う実行形態の**非公式呼称**（schema 上の判別子値ではない。判別子フィールド `mode` は廃止 → ADR-0013）。`results[]` に主体ごとの subjectResult を並べる。同一 tool・同一 command が構造的に保証される（複数ツールの束ねはオーケストレータの領分で別形状）（→ ADR-0011）。
 _Avoid_: batch を schema の判別子値として扱うこと; NDJSON / 複数文書で主体を並べること; batch に複数ツールを混載すること。
 
 **subjectResult**: `results[]` の要素。1 主体分の実行結果（`subject` / `status` / `startedAt` / `finishedAt` / `errors?` / `result`）。`subject` は常時必須（→ ADR-0013）。specVersion / tool / command / dryRun は持たず最上位にのみ置く（→ ADR-0011）。

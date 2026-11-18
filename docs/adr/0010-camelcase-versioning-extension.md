@@ -16,7 +16,7 @@
 
 ## 決定
 
-- フィールド命名は camelCase とする（nput の `manifest.json` と整合）。
+- フィールド命名は camelCase とする（layat の `manifest.json` と整合）。
 - `specVersion` は整数とする。
 - 時刻は `startedAt` + `finishedAt`（RFC 3339）で表す。
 - 消費側は未知フィールドを無視する（must-ignore）。
@@ -24,7 +24,7 @@
 
 ## 根拠
 
-- camelCase は JSON の一般的慣行であり、既存の nput `manifest.json` とも揃う。
+- camelCase は JSON の一般的慣行であり、既存の layat `manifest.json` とも揃う。
 - must-ignore により前方互換なフィールド追加が可能になり、`specVersion` のインフレを防げる。追加のたびに版を上げると消費側の追随を強制しエコシステムが分断する。
 - 整数バージョンとディレクトリ（`v1/`）を一致させることで、参照とレイアウトが単純になる。
 
@@ -36,6 +36,6 @@
 
 ## 棄却した代替案
 
-- **snake_case**: nput `manifest.json` と不整合になる。
+- **snake_case**: layat `manifest.json` と不整合になる。
 - **semver 文字列**: 規格のバージョン粒度に対して過剰。整数で足りる。
 - **フィールド追加でも `specVersion` を上げる**: 消費側に追随を強制し、前方互換の利点を失う。

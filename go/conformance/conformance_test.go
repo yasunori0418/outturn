@@ -81,7 +81,7 @@ func TestFormatAssertionRejectsBadDateTime(t *testing.T) {
 	envelope := func(topStart, topFinish, subStart, subFinish string) []byte {
 		return fmt.Appendf(nil, `{
   "specVersion": 1,
-  "tool": { "name": "nput", "version": "0.9.0" },
+  "tool": { "name": "layat", "version": "0.9.0" },
   "command": "apply",
   "status": "success",
   "dryRun": false,

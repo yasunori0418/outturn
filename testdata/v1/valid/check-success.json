@@ -1,7 +1,7 @@
 {
   "specVersion": 1,
   "tool": {
-    "name": "nboot",
+    "name": "example",
     "version": "0.1.0"
   },
   "command": "check",

@@ -1,7 +1,7 @@
 {
   "specVersion": 1,
   "tool": {
-    "name": "nput",
+    "name": "layat",
     "version": "0.9.0"
   },
   "command": "apply",
@@ -12,7 +12,7 @@
   "workingDirectory": "/home/alice/dotfiles",
   "errors": [
     {
-      "code": "W_NPUT_FOREIGN_SYMLINK",
+      "code": "W_LAYAT_FOREIGN_SYMLINK",
       "message": "error slot must not carry a W_ code"
     }
   ],

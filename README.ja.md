@@ -9,7 +9,7 @@
 本リポジトリは 2 つの役割を持つ:
 
 1. **outturn 規格**: 仕様・schema・適合テストデータ・参照実装
-2. **エコシステム中央ドキュメント**: n プレフィックスツール群の全体構想・ディストリビューション化プラン（[docs/ecosystem/](docs/ecosystem/)）
+2. **エコシステム中央ドキュメント**: エコシステムのツール群の全体構想・ディストリビューション化プラン（[docs/ecosystem/](docs/ecosystem/)）
 
 > **ステータス: draft (specVersion 1)** — 初期論点は確定済み。実装ツールからのフィードバックにより互換変更（フィールド追加）を積む段階。
 
@@ -60,7 +60,7 @@ outturn/
 ```jsonc
 {
   "specVersion": 1,
-  "tool": { "name": "nput", "version": "0.9.0" },
+  "tool": { "name": "layat", "version": "0.9.0" },
   "command": "apply",
   "status": "success",            // "success" | "error"（2 値のみ）
   "dryRun": false,                // plan でもスキーマは apply と同一
@@ -122,5 +122,5 @@ cp example.envrc .envrc && direnv allow    # または: nix develop ./dev
 
 ## 関連
 
-- [nput](https://github.com/yasunori0418/nput) — 配置プリミティブ（エコシステムの起点・active）
-- 他ツール（nboot / nwrap / nherd / nshadow / ncompose）は planned。[docs/ecosystem/overview.md](docs/ecosystem/overview.md) を参照
+- [layat](https://github.com/yasunori0418/layat) — 配置プリミティブ（エコシステムの起点・active）
+- 他ツールは planned。[docs/ecosystem/overview.md](docs/ecosystem/overview.md) を参照

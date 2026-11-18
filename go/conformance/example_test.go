@@ -27,7 +27,7 @@ func ExampleChecker_Check() {
 	}
 	envelopeJSON := []byte(`{
   "specVersion": 1,
-  "tool": {"name": "nput", "version": "0.9.0"},
+  "tool": {"name": "layat", "version": "0.9.0"},
   "command": "apply",
   "status": "success",
   "dryRun": false,
