@@ -22,6 +22,7 @@
   "dryRun": false,
   "startedAt": "2026-07-05T12:34:56+09:00",   // RFC 3339
   "finishedAt": "2026-07-05T12:34:58+09:00",
+  "workingDirectory": "/home/alice/dotfiles", // 実行時の作業ディレクトリ（絶対パス）
   "errors": [ Error, ... ],                   // 主体列挙・解決の前段エラーのみ
   "warnings": [ Warning, ... ],               // 実行全体の警告（任意）
   "info": { },                                // ツール固有（実行全体。任意）
@@ -36,6 +37,7 @@
 - `dryRun` はエンベロープ全体の性質で、`results` の全主体で均一とする（MUST）。`tool` / `command` / `specVersion` もトップレベルにのみ置き、主体ごとに変えない
 - `dryRun: true` の出力は、`dryRun` の値以外において apply と同一スキーマでなければならない（MUST）
 - `startedAt` / `finishedAt` は実行の開始・終了時刻を表す RFC 3339 の date-time 文字列でなければならない（MUST）。日付と時刻は `T`（または `t`）で区切り、タイムゾーンオフセット（`Z` または `±hh:mm`）を伴わなければならない（MUST）。`subjectResult` の `startedAt` / `finishedAt`（各主体の実行時刻）も同じ制約に従う。schema は `format: date-time` でこれを表現し、適合検証は format を assertion として評価する（§8）
+- `workingDirectory` は必須（MUST）で、値は絶対パスでなければならない（MUST）。値は実行時のプロセスの作業ディレクトリの観測記録であり、作業ディレクトリが結果に影響したことの宣言ではない。結果への影響の有無によらず常に出力する。入力の解決の起点を切り替えるツール（`-C dir` の類）は切り替え後の値を出力しなければならない（MUST）。シンボリックリンクの解決を含む正規化は求めない。schema は空でない文字列であることだけを検査し、絶対パスであることは本文のこの MUST で定める。絶対パスであることと切り替え後の値であることの MUST は、§8 (2) のリント検査の対象外である（→ ADR-0028）
 - トップレベル `errors[]` には**主体の列挙・解決の前段で起きる全体エラーのみ**を置く（入力 parse 失敗・specVersion 不能・主体列挙自体の失敗等）。解決済み主体に紐づくエラーを置いてはならない（MUST NOT）
 - トップレベル `warnings[]` には**実行全体に関わる警告**（主体に紐づかないもの）を置いてよい（MAY）。解決済み主体に紐づく警告は `subjectResult.warnings` に、処理単位に紐づく警告は `item.warnings` に置く。warning は `status` の集約に影響しない
 - warning の `code` は `W_` prefix、error の `code` は `E_` prefix でなければならない（MUST・§6 の二層命名）。schema は `$defs/warning` / `$defs/error` の pattern でこれを強制する
