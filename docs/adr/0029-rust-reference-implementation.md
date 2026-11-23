@@ -43,7 +43,7 @@ item の id は spec §5 の手順で導出し、どのツールが計算して�
 - `docs/guides/conformance.md`: cargo 経路の節を追加。
 - `AGENTS.md`: 検証コマンドに `cd rust && cargo test` を追加。値域や JCS 実装を変えるときに同時に更新する対象に Rust を追加。
 - `README.md`・`README.ja.md`・`docs/design.md`: 構成図に `rust/` を追加。
-- spec・schema・testdata は変えない。Go と Nix の実装も変えない。
+- spec・schema・testdata は変えない。Go と Nix の実装も変えない。spec §5 の「両参照実装」は Go と Nix を指す記述のまま据え置く。spec の「参照実装」(§2・§5)に Rust を含めるかは、spec を改める別の変更で扱う。
 
 ## 棄却した代替案
 
