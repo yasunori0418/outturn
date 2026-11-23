@@ -69,6 +69,10 @@
             # vendorHash で pin した FOD が取得するため vendor をコミットしない。
             go = outturn-go;
 
+            # Rust crate（rust/）のビルドとテスト（id-vectors の通過と id の単体テスト）。
+            # packages には出さない。
+            rust = import ./nix/pkgs/outturn-rust.nix { inherit pkgs; };
+
             # 適合ヘルパ mkSchemaCheck 自体の smoke test(dogfooding)。export した
             # lib.mkSchemaCheck に outturn の valid testdata を通し、検証器の配線・
             # schema 注入・find 集約が壊れていないことを outturn 自身の CI で固定する。
