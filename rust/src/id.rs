@@ -421,6 +421,15 @@ mod tests {
         assert!(Key::from_json(r#""\ud83d""#).is_err());
         assert!(Key::from_json(r#""\udd11""#).is_err());
         assert!(Key::from_json(r#""\ud83dx""#).is_err());
+        assert!(Key::from_json(r#""\ud83d\u0041""#).is_err());
+        assert!(Key::from_json(r#""\ud83d\ud83d""#).is_err());
+    }
+
+    #[test]
+    fn from_json_rejects_invalid_escapes() {
+        for bad in [r#""\x""#, r#""\u12G4""#, r#""\u12""#, r#""\"#] {
+            assert!(Key::from_json(bad).is_err(), "{bad:?}");
+        }
     }
 
     #[test]
@@ -478,6 +487,7 @@ mod tests {
             "[1,]",
             "{\"a\":1,}",
             "{a:1}",
+            "{\"a\" 1}",
             "tru",
             "nul",
             "[1 2]",
@@ -485,6 +495,13 @@ mod tests {
         ] {
             assert!(Key::from_json(bad).is_err(), "{bad:?}");
         }
+    }
+
+    #[test]
+    fn from_json_keeps_last_duplicate_member() {
+        let mut obj = BTreeMap::new();
+        obj.insert("a".to_string(), Key::Int(2));
+        assert_eq!(Key::from_json(r#"{"a":1,"a":2}"#), Ok(Key::Object(obj)));
     }
 
     fn identity(key: Key) -> Identity {
