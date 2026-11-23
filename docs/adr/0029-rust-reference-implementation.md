@@ -13,6 +13,7 @@ item の id は spec §5 の手順で導出し、どのツールが計算して�
 ## 決定
 
 - crate は `rust/` に置き、名前は `outturn` とする。持つものはエンベロープの型と item の id の導出の 2 つに限る。
+- 公開する型と関数は次のものに限る。id の導出は `Key`・`Key::from_json`・`Identity`・`derive_id`・`IdError`、エンベロープは `Envelope`・`SubjectResult`・`ResultBody`・`Item`・`Change`・`Tool`・`Subject`・`Error`・`Warning`・`Generation`・`Status`・`ItemStatus`・`ChangeKind`。結果本体の型名を `ResultBody` にするのは、`std::result::Result` を隠さないためである。
 - identity の key は独自の `Key` 型(`Null` / `Bool` / `Int(i64)` / `String` / `Array` / `Object` の enum)で表す。浮動小数は型で表せない。
 - JSON 文字列から key を読む `Key::from_json` は数値の字句を見る手書きのパーサにする。
 - JCS(RFC 8785)の正準化は手書きする(Go と同じ方針)。`Key::Int` の値域 ±(2^53−1) とメンバー名の ASCII 制約は `derive_id` で検査する。`-0` は `0` に正規化する(→ ADR-0027)。
@@ -21,20 +22,24 @@ item の id は spec §5 の手順で導出し、どのツールが計算して�
 - 読み込みでは規格型に無い未知のフィールドを無視する。これは spec §2 の must-ignore(→ ADR-0010)に従うもので、`deny_unknown_fields` は付けない。出力の厳密な検証は flake の `lib.mkSchemaCheck` が担う。
 - 依存は `serde`(derive)・`serde_json`・`sha2` と、dev 依存の `serde_json` の `raw_value` に限る。
 - crate は crates.io に公開しない(`publish = false`)。利用側は git のコミットを指定して依存する。
-- flake check には nixpkgs の `rustPlatform.buildRustPackage` で載せ(`checks.rust`)、`cargo test` で id-vectors の全ベクタの通過を検証する。
+- flake check には nixpkgs の `rustPlatform.buildRustPackage` と `cargoLock.lockFile` で載せ(`checks.rust`)、flake の入力は追加しない。`cargo test` で id-vectors の全ベクタの通過を検証する。
+- 往復テストでは `testdata/v1/valid/` のサンプルを読んで書き戻した JSON が、`serde_json::Value` として元と等しいことを確かめる。
 
 ## 根拠
 
 - 既定の `serde_json` は `-0` を `-0.0` として読むため(実測済み)、`-0`(域内)と `-0.0`(域外)を区別できない。spec §5 は数値を値でなく字句で判定する(→ ADR-0024)ので、字句を見るパーサが要る。
 - 浮動小数を持たない `Key` 型にすると、値域外の数値を型の段階で表せなくなる。整数の範囲とメンバー名の ASCII 制約は型で表しにくいので、`derive_id` で検査する。
 - 未知のフィールドを無視すると、規格に互換のフィールドが追加されても、古いバージョンの crate で新しい出力を読める。ADR-0010 が specVersion を上げずにフィールドを追加できるとしているのは、消費側が must-ignore に従うことが前提である。
-- 型引数 4 つと既定値 `serde_json::Value` は Go の `Envelope[TItem, TChange, TInfo, TEnvInfo]` に揃えた。ツールを知らない消費側は既定のまま規格部分だけを型で扱える。
+- 型引数の数と並びは Go の `Envelope[TItem, TChange, TInfo, TEnvInfo]` に揃えた。既定を `serde_json::Value` にしたのは、ツールを知らない消費側が型引数を書かずに規格部分だけを型で扱えるようにするためである(Go は既定の型引数を持たず、`json.RawMessage` を明示する)。
 - Rust のテストで id-vectors の全ベクタを検証することで、Go・Nix と同じ id を導出することを CI で示せる(→ ADR-0004)。
 
 ## 影響
 
 - `rust/`: crate(`src/id.rs`・`src/envelope.rs`)、id-vectors と往復のテスト、組み立ての例(`examples/conformance.rs`)を追加。
 - `flake.nix` と `nix/pkgs/outturn-rust.nix`: `checks.rust` を追加。
+- `dev/flake.nix`: 開発シェルに `cargo`・`rustc`・`rust-analyzer`・`clippy`・`rustfmt` を追加。
+- `.gitignore`: `rust/target/` を追加。
+- `.github/actions/changes/action.yaml`: Rust の変更で flake check を実行するため、パスフィルタに `**.rs`・`rust/Cargo.toml`・`rust/Cargo.lock` を追加。
 - `docs/guides/conformance.md`: cargo 経路の節を追加。
 - `AGENTS.md`: 検証コマンドに `cd rust && cargo test` を追加。値域や JCS 実装を変えるときに同時に更新する対象に Rust を追加。
 - `README.md`・`README.ja.md`・`docs/design.md`: 構成図に `rust/` を追加。

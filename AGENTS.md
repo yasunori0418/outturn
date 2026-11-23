@@ -15,7 +15,7 @@ outturn — エコシステムのツールが実行結果を単一の構造化 J
 ## 検証コマンド
 
 ```sh
-nix flake check                    # id-vectors / go(適合検証 + ベクタ通過)を一括検証
+nix flake check                    # id-vectors / go(適合検証 + ベクタ通過)/ rust(cargo test)を一括検証
 cd go && go test ./...             # id-vectors 通過 + testdata 適合検証
 cd rust && cargo test              # id-vectors 通過 + valid サンプルの往復(Rust)
 nix run .#validate -- <file.json>  # 単一エンベロープを適合検証(outturn-validate)
