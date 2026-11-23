@@ -7,3 +7,4 @@ description = "outturn result envelope types and item id derivation"
 license = "MIT"
 
 [dependencies]
+sha2 = "0.10"

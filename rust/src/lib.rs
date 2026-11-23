@@ -4,4 +4,4 @@
 
 mod id;
 
-pub use id::{IdError, Identity, Key};
+pub use id::{derive_id, IdError, Identity, Key};

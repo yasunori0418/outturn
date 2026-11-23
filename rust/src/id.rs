@@ -8,6 +8,8 @@
 use std::collections::BTreeMap;
 use std::fmt;
 
+use sha2::{Digest, Sha256};
+
 /// identity の key。spec §5 の値域にある JSON 値を表す。
 ///
 /// 浮動小数は型で表せない。整数の値域 ±(2^53−1) とメンバー名の ASCII 制約は
@@ -62,6 +64,88 @@ impl Key {
         }
         Ok(key)
     }
+}
+
+/// 整数の値域の上限 2^53−1（spec §5）。
+const MAX_SAFE_INTEGER: i64 = (1 << 53) - 1;
+
+/// identity から item の id を導出する。
+///
+/// id は `sha256(JCS({"kind": kind, "key": key}))` の 64 文字の小文字 16 進である。
+/// key が spec §5 の値域の外にある（整数の絶対値が 2^53−1 を超える、メンバー名が
+/// ASCII でない）ときは `Err` を返す。
+pub fn derive_id(identity: &Identity) -> Result<String, IdError> {
+    // JCS のメンバー順では "key" が "kind" より前に来る。
+    let canonical = format!(
+        "{{\"key\":{},\"kind\":{}}}",
+        canonicalize(&identity.key)?,
+        encode_string(&identity.kind)
+    );
+    let digest = Sha256::digest(canonical.as_bytes());
+    Ok(digest.iter().map(|b| format!("{b:02x}")).collect())
+}
+
+/// key を JCS（RFC 8785）で正準化し、spec §5 の値域を検査する。
+///
+/// メンバー名は ASCII に限るので、`BTreeMap` のバイト順は JCS が定める
+/// UTF-16 code unit 順と一致する。
+fn canonicalize(key: &Key) -> Result<String, IdError> {
+    Ok(match key {
+        Key::Null => "null".to_string(),
+        Key::Bool(b) => b.to_string(),
+        Key::Int(n) => {
+            if !(-MAX_SAFE_INTEGER..=MAX_SAFE_INTEGER).contains(n) {
+                return Err(IdError {
+                    message: format!("integer is out of identity domain ±(2^53-1) (got {n})"),
+                });
+            }
+            n.to_string()
+        }
+        Key::String(s) => encode_string(s),
+        Key::Array(items) => {
+            let parts = items
+                .iter()
+                .map(canonicalize)
+                .collect::<Result<Vec<_>, _>>()?;
+            format!("[{}]", parts.join(","))
+        }
+        Key::Object(members) => {
+            let mut parts = Vec::with_capacity(members.len());
+            for (name, value) in members {
+                if !name.is_ascii() {
+                    return Err(IdError {
+                        message: format!("object member name must be ASCII (got {name:?})"),
+                    });
+                }
+                parts.push(format!("{}:{}", encode_string(name), canonicalize(value)?));
+            }
+            format!("{{{}}}", parts.join(","))
+        }
+    })
+}
+
+/// JCS の最小のエスケープで文字列を書く（`go/id.go` の `encodeString` と同じ）。
+///
+/// 短縮形のない 0x20 未満の文字は `\u00xx`（小文字の 16 進）で書き、非 ASCII は
+/// エスケープしない。
+fn encode_string(s: &str) -> String {
+    let mut out = String::with_capacity(s.len() + 2);
+    out.push('"');
+    for c in s.chars() {
+        match c {
+            '"' => out.push_str("\\\""),
+            '\\' => out.push_str("\\\\"),
+            '\x08' => out.push_str("\\b"),
+            '\x0c' => out.push_str("\\f"),
+            '\n' => out.push_str("\\n"),
+            '\r' => out.push_str("\\r"),
+            '\t' => out.push_str("\\t"),
+            c if (c as u32) < 0x20 => out.push_str(&format!("\\u{:04x}", c as u32)),
+            c => out.push(c),
+        }
+    }
+    out.push('"');
+    out
 }
 
 /// RFC 8259 の JSON を読む。数値の字句を保つため手書きする。
@@ -399,5 +483,59 @@ mod tests {
         ] {
             assert!(Key::from_json(bad).is_err(), "{bad:?}");
         }
+    }
+
+    fn identity(key: Key) -> Identity {
+        Identity {
+            kind: "n".to_string(),
+            key,
+        }
+    }
+
+    #[test]
+    fn derive_id_matches_known_vector() {
+        let key = Key::from_json(r#"{"target":".zshrc"}"#).unwrap();
+        let id = Identity {
+            kind: "entry".to_string(),
+            key,
+        };
+        assert_eq!(
+            derive_id(&id),
+            Ok("2ba0b24fb64819dfe4bab60dd153fe5a636bdd5a7535d32039c1fe24736f97f8".to_string())
+        );
+    }
+
+    #[test]
+    fn derive_id_checks_integer_range() {
+        const MAX: i64 = (1 << 53) - 1;
+        assert!(derive_id(&identity(Key::Int(MAX))).is_ok());
+        assert!(derive_id(&identity(Key::Int(-MAX))).is_ok());
+        assert!(derive_id(&identity(Key::Int(MAX + 1))).is_err());
+        assert!(derive_id(&identity(Key::Int(-MAX - 1))).is_err());
+        assert!(derive_id(&identity(Key::Array(vec![Key::Int(i64::MIN)]))).is_err());
+    }
+
+    #[test]
+    fn derive_id_rejects_non_ascii_member_name() {
+        let mut obj = BTreeMap::new();
+        obj.insert("キー".to_string(), Key::Null);
+        let key = Key::Array(vec![Key::Object(obj)]);
+        assert!(derive_id(&identity(key)).is_err());
+    }
+
+    #[test]
+    fn canonicalize_escapes_strings_minimally() {
+        let key = Key::String("\"\\\x08\x0c\n\r\t\x1f\x7f/é🔑".to_string());
+        let expected = concat!(r#""\"\\\b\f\n\r\t"#, "\\", "u001f\x7f/é🔑\"");
+        assert_eq!(canonicalize(&key), Ok(expected.to_string()));
+    }
+
+    #[test]
+    fn canonicalize_sorts_members_and_keeps_array_order() {
+        let key = Key::from_json(r#"{"b":[3,1],"a":{"z":null,"B":true},"A":-0}"#).unwrap();
+        assert_eq!(
+            canonicalize(&key),
+            Ok(r#"{"A":0,"a":{"B":true,"z":null},"b":[3,1]}"#.to_string())
+        );
     }
 }
