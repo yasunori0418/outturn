@@ -1,5 +1,5 @@
 name: 'Detect relevant changes'
-description: 'nix flake check の入力（nix / Go / schema / testdata / scripts / CI）が変わったかを判定する。docs・spec 散文だけの変更では run=false。'
+description: 'nix flake check の入力（nix / Go / Rust / schema / testdata / scripts / CI）が変わったかを判定する。docs・spec 散文だけの変更では run=false。'
 outputs:
   run:
     description: 'true when check-relevant files changed, or on any non-pull_request event'
@@ -19,6 +19,9 @@ runs:
             - '**.nix'
             - '**.go'
             - 'go/go.mod'
+            - '**.rs'
+            - 'rust/Cargo.toml'
+            - 'rust/Cargo.lock'
             - 'schema/**'
             - 'testdata/**'
             - 'scripts/**'
