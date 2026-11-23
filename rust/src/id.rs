@@ -53,6 +53,7 @@ impl Key {
     /// 空白以外の文字があれば `Err` を返す。
     pub fn from_json(input: &str) -> Result<Key, IdError> {
         let mut p = Parser {
+            text: input,
             src: input.as_bytes(),
             pos: 0,
         };
@@ -153,6 +154,7 @@ fn encode_string(s: &str) -> String {
 /// 既定の `serde_json` は `-0` を `-0.0` として読み、域内の `-0` と域外の
 /// `-0.0` を区別できない。
 struct Parser<'a> {
+    text: &'a str,
     src: &'a [u8],
     pos: usize,
 }
@@ -285,8 +287,8 @@ impl Parser<'_> {
             }
             self.require_digits()?;
         }
-        // 数字と符号だけを読んだので UTF-8 として正しい。
-        let lexeme = std::str::from_utf8(&self.src[start..self.pos]).unwrap_or_default();
+        // ASCII だけを読んだので、範囲の両端は文字境界にある。
+        let lexeme = &self.text[start..self.pos];
         if self.pos != int_end {
             return Err(IdError {
                 message: format!("number must use integer notation (got {lexeme})"),
@@ -322,7 +324,7 @@ impl Parser<'_> {
                 self.pos += 1;
             }
             // 区切りの文字はすべて ASCII なので、切り出した範囲は UTF-8 の文字境界で終わる。
-            out.push_str(std::str::from_utf8(&self.src[run_start..self.pos]).unwrap_or_default());
+            out.push_str(&self.text[run_start..self.pos]);
             match self.peek() {
                 Some(b'"') => {
                     self.pos += 1;
