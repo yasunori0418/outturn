@@ -34,6 +34,7 @@
 | [0026](adr/0026-release-tagging-and-v1-stabilization.md) | リリースタグ運用(`v1.N.P` / `go/v1.N.P`)と v1 安定化基準を定める |
 | [0027](adr/0027-negative-zero-normalization.md) | identity の負ゼロ(`-0`)を `0` に正規化して域内とする |
 | [0028](adr/0028-working-directory-required-and-implicit-input.md) | workingDirectory を必須にし、standalone で暗黙の入力を記録付きで許容する |
+| [0029](adr/0029-rust-reference-implementation.md) | Rust 参照実装の crate を `rust/` に置く |
 
 ADR の書式と改訂注記の運用は [`docs/adr/README.md`](adr/README.md) を参照。
 
@@ -53,14 +54,15 @@ outturn/
 ├── schema/v1/        # JSON Schema（機械可読の正）
 ├── testdata/v1/      # valid / invalid サンプル + id-vectors.json
 ├── go/               # Go 参照実装（型 + id 導出 + 適合検証 + CLI outturn-validate）
+├── rust/             # Rust 参照実装（型 + id 導出）
 ├── nix/              # Nix lib（id 導出・ベクタ検証）
 ├── dev/              # 開発環境（devShell + mattpocock/skills 配置）
-└── flake.nix         # checks: id-vectors / go、apps: validate
+└── flake.nix         # checks: id-vectors / go / rust / rust-conformance、apps: validate
 ```
 
 - **正は JSON Schema**。文書とコードはそれに従う。
 - **id-vectors.json が最重要資産**: identity → 期待 id の対応表。JCS の罠（非 ASCII の値・数値表記・ネスト）を突くベクタと、域外を突く `rejected`（非整数表記・範囲外整数・非 ASCII メンバー名）を含め、全言語実装が CI でこれを通すことで導出の互換を証明する（→ ADR-0004, ADR-0024）。
-- 参照方法は二経路: Go ツールは go module で型を共有（コンパイル時）、各ツールの flake が本リポジトリを input に取り schema 検証 + MUST リント検査 + id-vectors 適合を checks で回す（CI 時）。schema で表現しきれない MUST（status 整合・itemId 参照整合・一意性）は `go/conformance` のリント層が担い、単一文書検証は CLI `outturn-validate`（`nix run .#validate`）が提供する（→ ADR-0021, ADR-0023）。standalone が求める暗黙の入力の解決結果の `info` への記録は、何を暗黙に解決したかをツールしか知らないため、リント検査の対象外とする（→ ADR-0028）。
+- 参照方法は三経路: Go ツールは go module で、Rust ツールは `rust/` の crate で型を共有（コンパイル時・→ ADR-0029）、各ツールの flake が本リポジトリを input に取り schema 検証 + MUST リント検査 + id-vectors 適合を checks で回す（CI 時）。schema で表現しきれない MUST（status 整合・itemId 参照整合・一意性）は `go/conformance` のリント層が担い、単一文書検証は CLI `outturn-validate`（`nix run .#validate`）が提供する（→ ADR-0021, ADR-0023）。standalone が求める暗黙の入力の解決結果の `info` への記録は、何を暗黙に解決したかをツールしか知らないため、リント検査の対象外とする（→ ADR-0028）。
 - バージョニング: specVersion 整数とディレクトリ（v1/）を一致させ、互換変更は v1 内 + リリースタグ、非互換変更のみ v2/ を新設する（詳細は「バージョニングとリリースタグ」節。→ ADR-0010, ADR-0026）。
 - ツール固有の info schema は各ツールのリポジトリが管理する（規格側で抱えない・→ ADR-0007）。
 

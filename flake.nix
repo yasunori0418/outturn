@@ -40,6 +40,8 @@
           # nix/pkgs/outturn-validate.nix に括り出し、packages.validate /
           # flake.lib.mkSchemaCheck と共有する。
           outturn-go = import ./nix/pkgs/outturn-validate.nix { inherit pkgs; };
+          # Rust crate（rust/）と例のバイナリ。checks.rust と checks.rust-conformance で共有する。
+          outturn-rust = import ./nix/pkgs/outturn-rust.nix { inherit pkgs; };
         in
         {
           packages.validate = outturn-go;
@@ -68,6 +70,19 @@
             # outturn-go の build/checkPhase で go test ./... が走る。依存は
             # vendorHash で pin した FOD が取得するため vendor をコミットしない。
             go = outturn-go;
+
+            # Rust crate（rust/）のビルドとテスト（id-vectors の通過と id の単体テスト）。
+            # packages には出さない。
+            rust = outturn-rust;
+
+            # Rust の例（rust/examples/conformance.rs）の出力を outturn-validate で
+            # 検証する（schema 検証と MUST のリント検査）。不適合なら失敗する。
+            rust-conformance = pkgs.runCommand "outturn-rust-conformance" { } ''
+              set -euo pipefail
+              ${outturn-rust}/bin/conformance \
+                | ${outturn-go}/bin/validate -schema ${./schema/v1/envelope.schema.json}
+              touch $out
+            '';
 
             # 適合ヘルパ mkSchemaCheck 自体の smoke test(dogfooding)。export した
             # lib.mkSchemaCheck に outturn の valid testdata を通し、検証器の配線・

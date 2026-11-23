@@ -53,6 +53,11 @@
               # 規格の参照実装・検証
               go
               gopls
+              cargo
+              rustc
+              rust-analyzer
+              clippy
+              rustfmt
               # フェッチ済みリポジトリ配置（pin 版）
               inputs'.layat.packages.layat
             ];

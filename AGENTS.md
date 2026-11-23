@@ -15,13 +15,14 @@ outturn — エコシステムのツールが実行結果を単一の構造化 J
 ## 検証コマンド
 
 ```sh
-nix flake check                    # id-vectors / go(適合検証 + ベクタ通過)を一括検証
+nix flake check                    # id-vectors / go(適合検証 + ベクタ通過)/ rust(cargo test)/ rust-conformance(例の出力を outturn-validate で検証)を一括検証
 cd go && go test ./...             # id-vectors 通過 + testdata 適合検証
+cd rust && cargo test              # id-vectors 通過 + valid サンプルの往復(Rust)
 nix run .#validate -- <file.json>  # 単一エンベロープを適合検証(outturn-validate)
 cd go && go generate ./...         # 正本(schema / id-vectors)変更後に embed コピーを手動同期
 ```
 
-`testdata/v1/id-vectors.json` が言語間互換の要。id 導出実装(go/・nix/)を触ったら必ず全ベクタ通過を確認する。
+`testdata/v1/id-vectors.json` が言語間互換の要。id 導出実装(go/・nix/・rust/)を触ったら必ず全ベクタ通過を確認する。
 
 正本(`schema/v1/`・`testdata/v1/id-vectors.json`)を変更したら `go generate ./...` で `go/internal/spec/` の embed コピーを同期する(自動では走らない)。同期し忘れは go test のバイト完全一致検査が CI で検出する。
 
@@ -41,7 +42,7 @@ cd go && go generate ./...         # 正本(schema / id-vectors)変更後に emb
 - 英語版 `README.md` を一次参照、`README.ja.md` はその日本語訳
 - `spec/v1/spec.md` は MUST/SHOULD/MAY(RFC 2119)の語彙を維持する
 - 互換変更(フィールド追加)は specVersion を上げない。削除・意味変更・必須化のみ specVersion increment(その場合 spec/v2/ を新設)
-- identity の値域は spec §5 に定める(文字列/整数±(2^53−1)/bool/null/配列/オブジェクト(メンバー名 ASCII))。域外は各実装が id 導出時に拒否する。値域や JCS 実装を変える場合は Go/Nix/ベクタの 3 点を同時に更新する
+- identity の値域は spec §5 に定める(文字列/整数±(2^53−1)/bool/null/配列/オブジェクト(メンバー名 ASCII))。域外は各実装が id 導出時に拒否する。値域や JCS 実装を変える場合は Go/Nix/Rust/ベクタの 4 点を同時に更新する
 
 ## 開発環境
 

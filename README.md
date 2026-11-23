@@ -50,6 +50,7 @@ outturn/
 │   ├── invalid/      #   samples the schema must reject
 │   └── id-vectors.json  # identity → expected id table (the key to cross-language compatibility)
 ├── go/               # Go reference implementation (envelope types + id derivation + conformance + outturn-validate CLI)
+├── rust/             # Rust reference implementation (envelope types + id derivation)
 ├── nix/              # Nix implementation (id derivation)
 ├── dev/              # Development environment (devShell + mattpocock/skills placement)
 └── flake.nix
@@ -96,12 +97,12 @@ A tool is outturn-conformant when:
 
 The Go module embeds both artifacts (byte-identical to the canonical files, enforced by CI): `conformance.NewDefaultChecker()` returns a ready-to-use checker for 1., and `outturn.IDVectorsV1()` exposes the vector table for 2., so Go consumers need no vendored copies.
 
-For a step-by-step guide to wiring this into your own tool (as a flake input or a Go module), see the [conformance guide](docs/guides/conformance.md).
+For a step-by-step guide to wiring this into your own tool (as a flake input, a Go module, or a Rust crate), see the [conformance guide](docs/guides/conformance.md).
 
 ## Validation
 
 ```sh
-nix flake check   # runs id-vectors (Nix impl) + go test (conformance + vectors)
+nix flake check   # runs id-vectors (Nix impl) + go test (conformance + vectors) + cargo test (Rust vectors) + outturn-validate on the Rust example's output
 ```
 
 Individually:
