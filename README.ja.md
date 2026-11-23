@@ -48,6 +48,7 @@ outturn/
 │   ├── invalid/      #   schema が拒否すべきサンプル
 │   └── id-vectors.json  # identity → 期待 id の対応表（言語間互換の要）
 ├── go/               # Go 参照実装（エンベロープ型 + id 導出 + 適合検証 + outturn-validate CLI）
+├── rust/             # Rust 参照実装（エンベロープ型 + id 導出）
 ├── nix/              # Nix 実装（id 導出）
 ├── dev/              # 開発環境（devShell + mattpocock/skills 配置）
 └── flake.nix
@@ -94,12 +95,12 @@ item id は `sha256(JCS(identity))` で機械的に導出する。ツールが�
 
 go module は両アーティファクトを embed している（正本とのバイト完全一致を CI が保証）。1. には `conformance.NewDefaultChecker()` がコンパイル済み checker を返し、2. には `outturn.IDVectorsV1()` がベクタ表を返すため、Go の consumer は vendored copy を持つ必要がない。
 
-自作ツールへの組み込み手順（flake input / go module）は[適合ガイド](docs/guides/conformance.md)を参照。
+自作ツールへの組み込み手順（flake input / go module / Rust の crate）は[適合ガイド](docs/guides/conformance.md)を参照。
 
 ## 検証
 
 ```sh
-nix flake check   # id-vectors(Nix 実装) + go test(適合検証 + ベクタ)を実行
+nix flake check   # id-vectors(Nix 実装) + go test(適合検証 + ベクタ) + cargo test(Rust のベクタ)を実行
 ```
 
 個別に:
