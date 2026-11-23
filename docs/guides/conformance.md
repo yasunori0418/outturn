@@ -2,12 +2,13 @@
 
 自作ツールを outturn 適合にするための最小手順をまとめる。本書は指針であり規範ではない。適合の定義は `README.md` の Conformance 節(schema 検証 / id-vectors 通過 / standalone の 3 点)を、standalone の規律は `spec/v1/spec.md` §8 を正とする。
 
-参照方法は 2 経路ある。両方を使うことも、片方だけを使うこともできる。
+参照方法は 3 経路ある。組み合わせて使うことも、1 つだけを使うこともできる。
 
 - **flake 経路**: outturn を flake input に取り、CI(`nix flake check`)で自ツールの出力サンプルを規格 schema で検証し、id 導出を id-vectors で固定する。
 - **go module 経路**: Go 製ツールが `github.com/yasunori0418/outturn/go` を import し、エンベロープ型を共有(コンパイル時)して item id を `DeriveID` で導出する。
+- **cargo 経路**: Rust 製ツールが `rust/` の crate `outturn` に git のコミットで依存し、エンベロープ型を共有して item id を `derive_id` で導出する。
 
-リリースの参照点はタグで指す。同一コミットに `v1.N.P`(規格スナップショット・flake input / 人間用)と `go/v1.N.P`(同一コミットの Go module 用ミラー)を対で打つ。Go module はサブディレクトリ(`go/`)にあり prefix 無しの root タグが Go ツールチェーンから見えないため、2 系統のタグが要る。詳細は `docs/design.md` の「バージョニングとリリースタグ」節(→ ADR-0026)。
+リリースの参照点はタグで指す。同一コミットに `v1.N.P`(規格スナップショット・flake input / 人間用)と `go/v1.N.P`(同一コミットの Go module 用ミラー)を対で打つ。Go module はサブディレクトリ(`go/`)にあり prefix 無しの root タグが Go ツールチェーンから見えないため、2 系統のタグが要る。詳細は `docs/design.md` の「バージョニングとリリースタグ」節(→ ADR-0026)。cargo 経路はタグでなくコミットで固定する(→ ADR-0029)。
 
 ## flake 経路
 
@@ -105,6 +106,39 @@ schema と id-vectors は go module に embed されている(正本とのバイ
 `NewDefaultChecker` は embed 済みの正本 schema をコンパイルした `Checker` を返す。`Check(envelopeJSON)` は違反メッセージのスライスを返し、空スライスなら適合。Example は Example 慣例に沿って `panic(err)` を使うため、自ツールのテスト関数へ組み込むときは `t.Fatal(err)` / `t.Errorf("outturn 不適合: %v", findings)` に置き換える。
 
 schema の生 bytes が要る場合は `conformance.SchemaV1()`、id-vectors の生 bytes は `outturn.IDVectorsV1()`(補助 API)。id 導出を `DeriveID` に委ねるツールは id-vectors の検証が module のテストで担われているため不要で、`IDVectorsV1` は id 導出を自前実装する場合の整合固定に使う。デコード時の注意(UseNumber 必須)は godoc を参照。
+
+## cargo 経路
+
+Rust 製ツールは `rust/` の crate `outturn` に依存し、エンベロープ型を共有して item id を導出する。crate は crates.io に公開していないので、`Cargo.toml` で git のコミットを指定する。cargo は git リポジトリの中から名前の合う crate を探すため、サブディレクトリ(`rust/`)を指定する必要はない。
+
+```toml
+[dependencies]
+# rev には依存したいコミットの SHA を書く
+outturn = { git = "https://github.com/yasunori0418/outturn", rev = "<コミットの SHA>" }
+```
+
+item id は identity(`kind` と `key`)から `derive_id` で導出する。key は `Key` 型で組み立てる。浮動小数は `Key` で表せず、整数の値域(±(2^53−1))やメンバー名の ASCII 制約(spec §5)を外れると `derive_id` が `Err` を返す。JSON 文字列の key を読むときは `Key::from_json` を使う。
+
+```rust
+use std::collections::BTreeMap;
+
+use outturn::{derive_id, Identity, Key};
+
+let key = Key::Object(BTreeMap::from([(
+    "path".to_string(),
+    Key::String(".zshrc".to_string()),
+)]));
+let id = derive_id(&Identity {
+    kind: "entry".to_string(),
+    key,
+})?;
+```
+
+エンベロープを組み立てて stdout に出す例は `rust/examples/conformance.rs`([source](../../rust/examples/conformance.rs))にあり、写経元はこちらを一次参照とする。例は `cargo test` でコンパイルされるため、型が変われば `nix flake check` が失敗する。
+
+`Envelope` は Go と同じく 4 つの型引数 `<TItem, TChange, TInfo, TEnvInfo>` を取り、既定はすべて `serde_json::Value` である。info は `Option` で持ち、`None` のときは出力に現れない。必須のフィールドの扱いは go module 経路と同じで、`dry_run` は `false` でも出力される。読み込みでは規格型に無い未知のフィールドを無視する(spec §2 の must-ignore)。
+
+crate は適合検証器を持たない。自ツールの出力サンプルの検証には、flake 経路の `lib.mkSchemaCheck` を使う。id 導出を `derive_id` に委ねるツールは、id-vectors の検証を crate のテストが担うため、`verifyVectors` の check は要らない。
 
 ## 単発検証
 
