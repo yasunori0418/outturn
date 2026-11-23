@@ -94,9 +94,13 @@ pub struct Change<TChange = Value> {
 }
 
 /// 1 主体分の結果の本体（`result`）。
+///
+/// 型引数は、`TItem` が `items` の要素の `info`、`TChange` が `changes` の要素の `info`、
+/// `TInfo` がこの型の `info` の型を表す。
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ResultBody<TItem = Value, TChange = Value, TInfo = Value> {
     pub items: Vec<Item<TItem>>,
+    // `#[serde(default)]` だと `TChange: Default` の境界が付くため、`Vec::new` で既定値を与える。
     #[serde(default = "Vec::new", skip_serializing_if = "Vec::is_empty")]
     pub changes: Vec<Change<TChange>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -114,6 +118,8 @@ pub struct Generation {
 }
 
 /// `results` の要素。1 主体分の実行結果。
+///
+/// 型引数はそのまま `result`（[`ResultBody`]）へ渡す。
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SubjectResult<TItem = Value, TChange = Value, TInfo = Value> {
@@ -134,6 +140,9 @@ pub struct SubjectResult<TItem = Value, TChange = Value, TInfo = Value> {
 ///
 /// `info` は実行全体のツール固有情報で、主体ごとの情報は [`ResultBody`] の `info` に置く。
 /// `working_directory` には実行時の作業ディレクトリを絶対パスで入れる。
+///
+/// 型引数のうち `TEnvInfo` がこの型の `info` の型で、`TItem`・`TChange`・`TInfo` は
+/// `results` の各要素の [`ResultBody`] へ渡す。
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Envelope<TItem = Value, TChange = Value, TInfo = Value, TEnvInfo = Value> {
