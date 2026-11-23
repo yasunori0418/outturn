@@ -57,7 +57,7 @@ outturn/
 ├── rust/             # Rust 参照実装（型 + id 導出）
 ├── nix/              # Nix lib（id 導出・ベクタ検証）
 ├── dev/              # 開発環境（devShell + mattpocock/skills 配置）
-└── flake.nix         # checks: id-vectors / go / rust、apps: validate
+└── flake.nix         # checks: id-vectors / go / rust / rust-conformance、apps: validate
 ```
 
 - **正は JSON Schema**。文書とコードはそれに従う。

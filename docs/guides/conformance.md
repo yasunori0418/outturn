@@ -134,7 +134,7 @@ let id = derive_id(&Identity {
 })?;
 ```
 
-エンベロープを組み立てて stdout に出す例は `rust/examples/conformance.rs`([source](../../rust/examples/conformance.rs))にあり、写経元はこちらを一次参照とする。例は `cargo test` でコンパイルされるため、型が変われば `nix flake check` が失敗する。
+エンベロープを組み立てて stdout に出す例は `rust/examples/conformance.rs`([source](../../rust/examples/conformance.rs))にあり、写経元はこちらを一次参照とする。例は `cargo test` でコンパイルされ、その出力は flake の check `rust-conformance` が `outturn-validate` で検証する。そのため、型が変わったときや出力が規格に適合しなくなったときは `nix flake check` が失敗する。
 
 `Envelope` は Go と同じく 4 つの型引数 `<TItem, TChange, TInfo, TEnvInfo>` を取り、既定はすべて `serde_json::Value` である。info は `Option` で持ち、`None` のときは出力に現れない。必須のフィールドの扱いは go module 経路と同じで、`dry_run` は `false` でも出力される。読み込みでは規格型に無い未知のフィールドを無視する(spec §2 の must-ignore)。
 

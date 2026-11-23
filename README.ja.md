@@ -100,7 +100,7 @@ go module は両アーティファクトを embed している（正本とのバ
 ## 検証
 
 ```sh
-nix flake check   # id-vectors(Nix 実装) + go test(適合検証 + ベクタ) + cargo test(Rust のベクタ)を実行
+nix flake check   # id-vectors(Nix 実装) + go test(適合検証 + ベクタ) + cargo test(Rust のベクタ) + Rust の例の出力の outturn-validate による検証を実行
 ```
 
 個別に:

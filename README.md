@@ -102,7 +102,7 @@ For a step-by-step guide to wiring this into your own tool (as a flake input, a 
 ## Validation
 
 ```sh
-nix flake check   # runs id-vectors (Nix impl) + go test (conformance + vectors) + cargo test (Rust vectors)
+nix flake check   # runs id-vectors (Nix impl) + go test (conformance + vectors) + cargo test (Rust vectors) + outturn-validate on the Rust example's output
 ```
 
 Individually:
