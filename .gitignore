@@ -32,3 +32,6 @@ result-*
 
 # ---- layat 配置物（dev の shellHook が layat apply skills で生成）----
 .claude/skills/*
+
+# ---- Rust ----
+rust/target/

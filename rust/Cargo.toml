@@ -1,0 +1,9 @@
+[package]
+name = "outturn"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "outturn result envelope types and item id derivation"
+license = "MIT"
+
+[dependencies]
